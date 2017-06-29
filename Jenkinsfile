@@ -1,6 +1,7 @@
 stage("checkout") {
   node {
     def foo = checkout scm
-    echo "${foo}"
+    def bar = foo.collect{k,v -> "env.$k = $v" }
+    echo "${bar}"
   }
 }
