@@ -1,7 +1,5 @@
 stage("checkout") {
   node {
-    def foo = checkout scm
-    foo.collect{k,v -> k = v }
-    echo "${GIT_COMMIT}"
+    checkout(scm).each { k,v -> env.set(k, v) }
   }
 }
