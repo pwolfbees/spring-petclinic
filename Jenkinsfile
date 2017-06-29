@@ -1,7 +1,7 @@
 stage("checkout") {
   node {
     def foo = checkout scm
-    def bar = foo.collect{k,v -> "env.$k = $v" }
-    echo "${bar}"
+    foo.collect{k,v -> evaluate("env.$k = $v") }
+    echo "${GIT_COMMIT}"
   }
 }
