@@ -8,7 +8,7 @@ pipeline {
     options {
         // global timeout to kill rogue builds
         timeout(time: 12, unit: 'HOURS')
-        buildDiscarder(logRotator(numToKeepStr: "${numToKeepStr}", artifactNumToKeepStr: "${artifactNumToKeepStr}"))
+        buildDiscarder(logRotator(numToKeepStr: "${env.numToKeepStr}", artifactNumToKeepStr: "${env.artifactNumToKeepStr}"))
         timestamps()
         skipStagesAfterUnstable()
     }
