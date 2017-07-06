@@ -1,8 +1,9 @@
 pipeline {
     agent any
     environment {
-        numToKeepStr = "${CHANGE_ID != null ? 3 : 100}"
-        artifactNumToKeepStr = "${CHANGE_ID != null ? 1 : 5}"
+        changeId = "${CHANGE_ID ? 0}"
+        numToKeepStr = "${CHANGE_ID != 0 ? 3 : 100}"
+        artifactNumToKeepStr = "${CHANGE_ID != 0 ? 1 : 5}"
     }
     
     stages {
