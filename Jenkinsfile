@@ -1,9 +1,16 @@
-stage("checkout") {
-  node {
-    checkout(scm).each { k,v -> env.setProperty(k, v) }
-    echo "$GIT_COMMIT"
+pipeline {
+    agent any
+    environment {
+        numToKeepStr = "${CHANGE_ID != null ? 3 : 100}"
+        artifactNumToKeepStr = "${CHANGE_ID != null ? 1 : 5}"
+    }
     
-    def foo = currentBuild.getCulprits()
-    echo "${foo}"
-  }
+    stages {
+        stage("hello") {
+            steps {
+                echo "$numToKeepStr"
+                echo "$artifactNumToKeepStr"
+            }
+        }
+    }
 }
