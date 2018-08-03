@@ -22,10 +22,10 @@ spec:
     tty: true
     volumeMounts:
       - name: kaniko-secret
-        mountPath: /root
+        mountPath: /secret
     env:
       - name: GOOGLE_APPLICATION_CREDENTIALS
-        value: /root/kaniko-secret.json
+        value: /secret/kaniko-secret.json
   restartPolicy: Never
   volumes:
     - name: kaniko-secret
