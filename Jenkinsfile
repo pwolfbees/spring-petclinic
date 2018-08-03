@@ -2,7 +2,7 @@ pipeline {
   agent {  //label 'maven && kaniko && k8s'
     kubernetes {
     label 'kaniko'
-    yaml: """
+    yaml """
 apiVersion: v1
 kind: Pod
 metadata:
