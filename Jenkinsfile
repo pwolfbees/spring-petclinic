@@ -1,6 +1,6 @@
 pipeline {
   agent {
-    label 'maven && kaniko'
+    label 'maven && kaniko && k8s'
   }
   stages {
     stage('Maven') {
@@ -14,7 +14,7 @@ pipeline {
         steps {
             container(name:'kaniko-debug', shell:'/busybox/sh') {
                 sh '''#!/busybox/sh 
-                    /kaniko/executor --help
+                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure-skip-tls-verify --destination=gcr.io/partner-demo-dev/bin-auth/petclinic:latest
                     '''
             }
         }
