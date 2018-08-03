@@ -12,7 +12,7 @@ spec:
   - name: maven
     image: maven:3.5.0
     command:
-    - /bin/sh -c
+    - cat
     tty: true
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
@@ -22,10 +22,10 @@ spec:
     tty: true
     volumeMounts:
       - name: kaniko-secret
-        mountPath: /secret
+        mountPath: /root
     env:
       - name: GOOGLE_APPLICATION_CREDENTIALS
-        value: /secret/kaniko-secret.json
+        value: /root/kaniko-secret.json
   restartPolicy: Never
   volumes:
     - name: kaniko-secret
