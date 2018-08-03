@@ -46,7 +46,7 @@ spec:
         steps {
             container(name:'kaniko', shell:'/busybox/sh') {
                 sh '''#!/busybox/sh 
-                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure-skip-tls-verify --destination=gcr.io/partner-demo-dev/bin-auth/petclinic:latest
+                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure-skip-tls-verify --destination=gcr.io/cloudbees-corev/bin-auth/petclinic:latest
                     '''
             }
         }
