@@ -2,7 +2,8 @@ pipeline {
   agent {
     //label 'maven && kaniko && k8s'
     kubernetes {
-        name: 'bin-auth-build', label: k8s, yaml: """
+    label: 'kaniko'
+    yaml: """
 kind: Pod
 metadata:
   name: bin-auth-build
