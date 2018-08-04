@@ -34,6 +34,18 @@ spec:
 """
     }
   }
+options {
+      skipDefaultCheckout true
+  }
+  
+  environment {
+      GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //workaround for bug in Kubernetes Plugin JENKINS-52885
+      GCP_PROJECT = "cloudbees-public"
+      IMAGE_PREFIX = "bin-auth"
+      IMAGE_NAME = "petclinic"
+  }
+
+
   stages {
     stage('Maven') {
       steps {
@@ -42,11 +54,27 @@ spec:
         }
       }
     }
-    stage('Docker Build') {
+    stage('Build Image') {
+        when {
+            not {
+                buildingTag
+            }
+        }
         steps {
             container(name:'kaniko', shell:'/busybox/sh') {
                 sh '''#!/busybox/sh 
-                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=gcr.io/cloudbees-public/bin-auth/petclinic:latest
+                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$GIT_COMMIT
+                    '''
+            }
+        }
+        stage('Build Tagged Image') {
+        when {
+                buildingTag
+        }
+        steps {
+            container(name:'kaniko', shell:'/busybox/sh') {
+                sh '''#!/busybox/sh 
+                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$TAG_NAME 
                     '''
             }
         }
