@@ -67,7 +67,8 @@ options {
                     '''
             }
         }
-        stage('Build Tagged Image') {
+    }
+    stage('Build Tagged Image') {
         when {
                 buildingTag
         }
