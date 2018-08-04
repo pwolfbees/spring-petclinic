@@ -57,7 +57,7 @@ options {
     stage('Build Image') {
         when {
             not {
-                buildingTag
+                buildingTag()
             }
         }
         steps {
@@ -70,7 +70,7 @@ options {
     }
     stage('Build Tagged Image') {
         when {
-                buildingTag
+                buildingTag()
         }
         steps {
             container(name:'kaniko', shell:'/busybox/sh') {
