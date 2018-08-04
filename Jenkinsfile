@@ -14,6 +14,16 @@ spec:
     command:
     - cat
     tty: true
+  - name: gcloud
+    image: gcr.io/cloud-builders/gcloud
+    command:
+    - cat
+    tty: true
+  - name: kubectl
+    image: gcr.io/cloud-builders/kubectl
+    command:
+    - cat
+    tty: true
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -50,15 +60,15 @@ options {
     stage('Maven') {
       steps {
         container('maven') {
-          sh 'mvn clean install'
+          sh 'mvn --version' //clean install'
         }
       }
     }
     stage('Build Image') {
         when {
-            not {
+            //not {
                 buildingTag()
-            }
+          //  }
         }
         steps {
             container(name:'kaniko', shell:'/busybox/sh') {
@@ -69,21 +79,28 @@ options {
         }
     }
     stage('Build Tagged Image') {
-        when {
-                buildingTag()
+      when {
+          buildingTag()
+      }
+      steps {
+        container(name:'kaniko', shell:'/busybox/sh') {
+          sh '''#!/busybox/sh 
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$TAG_NAME 
+          '''
         }
-        steps {
-            container(name:'kaniko', shell:'/busybox/sh') {
-                sh '''#!/busybox/sh 
-                    /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$TAG_NAME 
-                    '''
-            }
+      }
+      post {
+        success{
+          echo "sign it"
         }
-        post {
-            success{
-                echo "sign it"
-            }
+      }
+    }
+    stage('Set Context') {
+      steps {
+        container('gcloud') {
+          sh "gcloud container clusters get-credentials bin-auth-deploy"
         }
+      }
     }
   }
 }
