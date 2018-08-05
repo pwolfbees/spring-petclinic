@@ -42,7 +42,24 @@ options {
         } 
       }
     }
-    stage('Deploy') {
+    stage('Production Image') {
+      when {
+          buildingTag()
+      }
+      steps {
+        container(name:'kaniko', shell:'/busybox/sh') {
+          sh '''#!/busybox/sh 
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_TAG} --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$TAG_NAME --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:latest
+          '''
+        }
+      }
+      post {
+        success {
+          echo "sign it"
+        }
+      }
+    }
+    stage('Deploy Petclinic') {
       steps {
         container('gcloud') {
           sh "gcloud auth activate-service-account --key-file=/secret/jenkins-secret.json --no-user-output-enabled"
@@ -52,18 +69,11 @@ options {
           sh "kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml" 
         }
       }
-    }
-    stage('Production Build') {
-      when {
-          buildingTag()
-      }
-      steps {
-        container(name:'kaniko', shell:'/busybox/sh') {
-          sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$TAG_NAME --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$GIT_COMMIT --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:latest
-          '''
-        }
-      }
     } 
+  }
+  post {
+    always {
+      cleanWs()
+    }
   }
 }
