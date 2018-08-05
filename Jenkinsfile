@@ -19,11 +19,9 @@ spec:
     command:
     - cat
     tty: true
-  - name: kubectl
-    image: gcr.io/cloud-builders/kubectl
-    command:
-    - cat
-    tty: true
+    volumeMounts:
+      - name: jenkins-secret
+        mountPath: /secret
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -31,16 +29,13 @@ spec:
     - /busybox/cat
     tty: true
     volumeMounts:
-      - name: kaniko-secret
+      - name: jenkins-secret
         mountPath: /secret
-    env:
-      - name: GOOGLE_APPLICATION_CREDENTIALS
-        value: /secret/kaniko-secret.json
   restartPolicy: Never
   volumes:
-    - name: kaniko-secret
+    - name: jenkins-secret
       secret:
-        secretName: kaniko-secret
+        secretName: jenkins-secret
 """
     }
   }
@@ -49,26 +44,26 @@ options {
   }
   
   environment {
+      GOOGLE_APPLICATION_CREDENTIALS = "/secret/jenkins-secret.json"
       GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //workaround for bug in Kubernetes Plugin JENKINS-52885
       GCP_PROJECT = "cloudbees-public"
       IMAGE_PREFIX = "bin-auth"
       IMAGE_NAME = "petclinic"
   }
 
-
   stages {
     stage('Maven') {
       steps {
         container('maven') {
-          sh 'mvn --version' //clean install'
+          sh 'mvn --version'
         }
       }
     }
     stage('Build Image') {
         when {
-            //not {
+            not {
                 buildingTag()
-          //  }
+            }
         }
         steps {
             container(name:'kaniko', shell:'/busybox/sh') {
@@ -98,7 +93,9 @@ options {
     stage('Set Context') {
       steps {
         container('gcloud') {
-          sh "gcloud container clusters get-credentials bin-auth-deploy"
+          sh "gcloud auth activate-service-account --key-file=/secret/jenkins-secret.json"
+          sh "gcloud container clusters get-credentials cloudbees-core --zone us-east1-b --project cloudbees-public"
+          sh "kubectl get pods"
         }
       }
     }
