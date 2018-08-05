@@ -2,41 +2,7 @@ pipeline {
   agent {
     kubernetes {
         label 'kaniko'
-        yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  name: kaniko
-spec:
-  containers:
-  - name: maven
-    image: maven:3.5.0
-    command:
-    - cat
-    tty: true
-  - name: gcloud
-    image: gcr.io/cloud-builders/gcloud
-    command:
-    - cat
-    tty: true
-    volumeMounts:
-      - name: jenkins-secret
-        mountPath: /secret
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
-    volumeMounts:
-      - name: jenkins-secret
-        mountPath: /secret
-  restartPolicy: Never
-  volumes:
-    - name: jenkins-secret
-      secret:
-        secretName: jenkins-secret
-"""
+        yamlFile 'k8s/kaniko-build-pod.yaml'
     }
   }
 options {
@@ -55,7 +21,7 @@ options {
     stage('Maven') {
       steps {
         container('maven') {
-          sh 'mvn --version'
+          sh 'mvn clean install'
         }
       }
     }
