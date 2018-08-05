@@ -6,3 +6,7 @@ target/*
 *.iml
 /target
 _site/
+.editorconfig
+.mvn
+.springBeans
+.settings
