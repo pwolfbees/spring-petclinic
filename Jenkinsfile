@@ -5,7 +5,8 @@ pipeline {
         yamlFile 'k8s/kaniko-build-pod.yaml'
     }
   }
-options {
+
+  options {
       skipDefaultCheckout true //workaround for bug in Kubernetes Plugin JENKINS-52885
   }
   
@@ -38,7 +39,6 @@ options {
           sh '''#!/busybox/sh 
           /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_TAG}
           '''
-          sh "sed -i.bak 's#gcr.io/${GCP_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}:REPLACEME#${IMAGE_TAG}#' ./k8s/petclinic-deploy.yaml"
         } 
       }
     }
@@ -51,6 +51,7 @@ options {
           sh '''#!/busybox/sh 
           /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_TAG} --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$TAG_NAME --destination=gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:latest
           '''
+          
         }
       }
       post {
@@ -64,6 +65,7 @@ options {
         container('gcloud') {
           sh "gcloud auth activate-service-account --key-file=/secret/jenkins-secret.json --no-user-output-enabled"
           sh "gcloud container clusters get-credentials bin-auth-deploy --zone us-east1-b --project cloudbees-public"
+          sh "sed -i.bak 's#gcr.io/${GCP_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}:REPLACEME#${IMAGE_TAG}#' ./k8s/petclinic-deploy.yaml"
           sh "kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}"
           sh "kubectl --namespace=${NAMESPACE} apply -f k8s/lb-service.yaml"
           sh "kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml" 
