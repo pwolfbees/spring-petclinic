@@ -1,12 +1,16 @@
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: petclinic-deploy
-  labels:
-    app: petclinic
 spec:
-  containers:
-  - name: petclinic
-    image: gcr.io/cloudbees-public/bin-auth/petclinic:REPLACEME
-    ports:
-    - containerPort: 8080
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+        - name: petclinic
+          image: gcr.io/cloudbees-public/bin-auth/petclinic:REPLACEME
+          ports:
+            - containerPort: 8080
