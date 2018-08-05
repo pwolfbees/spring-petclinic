@@ -1,12 +1,12 @@
 pipeline {
   agent {
     kubernetes {
-        label 'kaniko'
+        label 'petclinic'
         yamlFile 'k8s/kaniko-build-pod.yaml'
     }
   }
 options {
-      skipDefaultCheckout true
+      skipDefaultCheckout true //workaround for bug in Kubernetes Plugin JENKINS-52885
   }
   
   environment {
@@ -16,6 +16,7 @@ options {
       IMAGE_PREFIX = "bin-auth"
       IMAGE_NAME = "petclinic"
       IMAGE_TAG = "gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$GIT_COMMIT"
+      NAMESPACE = "${env.TAG_NAME ?: env.BRANCH_NAME}"
   }
 
   stages {
@@ -26,7 +27,7 @@ options {
         }
       }
     }
-    stage('Dev Image') {
+    stage('Branch Image') {
       when {
         not {
           buildingTag()
@@ -41,13 +42,14 @@ options {
         } 
       }
     }
-    stage('Dev Deploy') {
+    stage('Deploy') {
       steps {
         container('gcloud') {
           sh "gcloud auth activate-service-account --key-file=/secret/jenkins-secret.json --no-user-output-enabled"
           sh "gcloud container clusters get-credentials bin-auth-deploy --zone us-east1-b --project cloudbees-public"
-          sh "kubectl get ns ${env.BRANCH_NAME} || kubectl create ns ${env.BRANCH_NAME}"
-          sh "kubectl --namespace=${env.BRANCH_NAME} apply -f k8s/petclinic-deploy.yaml" 
+          sh "kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}"
+          sh "kubectl --namespace=${NAMESPACE} apply -f k8s/lb-service.yaml"
+          sh "kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml" 
         }
       }
     }
