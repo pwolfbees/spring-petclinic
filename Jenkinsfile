@@ -17,7 +17,7 @@ pipeline {
       IMAGE_PREFIX = "bin-auth"
       IMAGE_NAME = "petclinic"
       IMAGE_TAG = "gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$GIT_COMMIT"
-      NAMESPACE = "${env.TAG_NAME ?: env.BRANCH_NAME}"
+      NAMESPACE = "${env.TAG_NAME ? 'production' : env.BRANCH_NAME}"
   }
 
   stages {
