@@ -16,8 +16,7 @@ pipeline {
       GCR_PROJECT = "cloudbees-public"
       IMAGE_PREFIX = "bin-auth"
       IMAGE_NAME = "petclinic"
-      IMAGE_TAG = "gcr.io/$GCP_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME:$GIT_COMMIT"
-      NAMESPACE = "${buildingTag() ? 'production' : env.BRANCH_NAME}"
+      IMAGE_URL = "gcr.io/$GCR_PROJECT/$IMAGE_PREFIX/$IMAGE_NAME"
       TARGET_PROJECT = "cloudbees-public"
       TARGET_CLUSTER = "bin-auth-deploy"
   }
@@ -39,7 +38,7 @@ pipeline {
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
           sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_TAG}
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_URL}:${GIT_COMMIT}
           '''
         } 
       }
@@ -51,7 +50,7 @@ pipeline {
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
           sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_TAG} --destination=gcr.io/${GCR_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}:${TAG_NAME} --destination=gcr.io/${GCR_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}:latest
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_URL}:${GIT_COMMIT} --destination=${IMAGE_URL}:${TAG_NAME} --destination=${IMAGE_URL}:latest
           '''
         }
       }
@@ -75,10 +74,10 @@ pipeline {
       steps {
         container('kubectl') {
           sh '''
-          sed -i.bak 's#gcr.io/${GCR_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}:REPLACEME#${IMAGE_TAG}#' ./k8s/petclinic-deploy.yaml
-          kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
-          kubectl --namespace=${NAMESPACE} apply -f k8s/lb-service.yaml
-          kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml
+          sed -i.bak 's#REPLACEME#${IMAGE_URL}:${GIT_COMMIT}#' ./k8s/petclinic-deploy.yaml
+          kubectl get ns ${BRANCH_NAME} || kubectl create ns ${BRANCH_NAME}
+          kubectl --namespace=${BRANCH_NAME} apply -f k8s/lb-service.yaml
+          kubectl --namespace=${BRANCH_NAME} apply -f k8s/petclinic-deploy.yaml
           '''
         }
       }

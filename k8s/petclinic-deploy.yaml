@@ -11,6 +11,6 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: gcr.io/cloudbees-public/bin-auth/petclinic:REPLACEME
+          image: REPLACEME
           ports:
             - containerPort: 8080
