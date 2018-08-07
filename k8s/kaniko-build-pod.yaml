@@ -4,6 +4,10 @@ metadata:
   name: kaniko-build-pod
 spec:
   containers:
+  - name: maven
+    image: maven:3.5.0
+    command:
+    - cat
   - name: kubectl
     image: gcr.io/cloud-builders/kubectl
     command:
