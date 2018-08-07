@@ -25,7 +25,7 @@ pipeline {
     stage('Maven') {
       steps {
         container('maven') {
-          sh 'mvn clean install'
+          sh 'mvn clean install -DskipTests=true'
         }
       }
     }
@@ -60,7 +60,7 @@ pipeline {
         container('gcloud') {
           sh '''
           gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
-          gcloud beta container binauthz create-signature-payload --artifact-url="9gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)')" > /tmp/generated_payload.json
+          gcloud beta container binauthz create-signature-payload --artifact-url=(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)') > /tmp/generated_payload.json
           gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
           '''
         }
