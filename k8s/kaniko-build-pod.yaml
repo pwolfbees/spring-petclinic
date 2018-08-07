@@ -8,6 +8,7 @@ spec:
     image: maven:3.5.0
     command:
     - cat
+    tty: true
   - name: kubectl
     image: gcr.io/cloud-builders/kubectl
     command:
@@ -17,7 +18,7 @@ spec:
       - name: shared-root
         mountPath: /root
   - name: gcloud
-    image: gcr.io/cloud-builders/gcloud-slim
+    image: gcr.io/cloud-builders/gcloud
     command:
     - cat
     tty: true
@@ -42,4 +43,3 @@ spec:
     - name: jenkins-secret
       secret:
         secretName: jenkins-secret
-  
