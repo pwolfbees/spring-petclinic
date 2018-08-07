@@ -4,17 +4,22 @@ metadata:
   name: kaniko-build-pod
 spec:
   containers:
-  - name: maven
-    image: maven:3.5.0
-    command:
-    - cat
-    tty: true
-  - name: gcloud
-    image: gcr.io/cloud-builders/gcloud
+  - name: kubectl
+    image: gcr.io/cloud-builders/kubectl
     command:
     - cat
     tty: true
     volumeMounts:
+      - name: shared-root
+        mountPath: /root
+  - name: gcloud
+    image: gcr.io/cloud-builders/gcloud-slim
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+      - name: shared-root
+        mountPath: /root
       - name: jenkins-secret
         mountPath: /secret
   - name: kaniko
@@ -28,6 +33,8 @@ spec:
         mountPath: /secret
   restartPolicy: Never
   volumes:
+    - name: shared-root
+      emptyDir: {}
     - name: jenkins-secret
       secret:
         secretName: jenkins-secret
