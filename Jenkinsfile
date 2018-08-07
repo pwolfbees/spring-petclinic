@@ -19,6 +19,8 @@ pipeline {
     IMAGE_URL = "gcr.io/${GCR_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}" //full container image URL without tag
     TARGET_PROJECT = "cloudbees-public"  //GCP Project where you want to deploy application. Requires Service Account access.
     TARGET_CLUSTER = "bin-auth-deploy"  //K8s Cluster where you want to deploy application. Requires Service Account access.
+    ATTESTOR = "demo-attestor"
+    ATTESTOR_EMAIL = "test-attestor@example.com"
   }
 
   stages {
@@ -59,9 +61,15 @@ pipeline {
       steps {
         container('gcloud') {
           sh '''
+          apt-get update
+          apt-get install gpgv2
           gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
-          gcloud beta container binauthz create-signature-payload --artifact-url=(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)') > /tmp/generated_payload.json
           gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
+          artifact-url=$(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)')
+          gcloud beta container binauthz create-signature-payload --artifact-url="$artifact-url" > /tmp/generated_payload.json
+          gpg --allow-secret-key-import --import /attestor/gpg.asc
+          gpg --local-user "${ATTESTOR_EMAIL}" --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
+          gcloud beta container binauthz attestations create --artifact-url="$artifact-url" --attestor="projects/${TARGET_PROJECT}/attestors/${ATTESTOR}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --fingerprint)"
           '''
         }
       }
