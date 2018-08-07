@@ -74,7 +74,7 @@ pipeline {
       steps {
         container('kubectl') {
           sh '''
-          sed -i.bak 's#REPLACEME#${IMAGE_URL}:${GIT_COMMIT}#' ./k8s/petclinic-deploy.yaml
+          sed -i.bak "s#REPLACEME#${IMAGE_URL}:${GIT_COMMIT}#" ./k8s/petclinic-deploy.yaml
           kubectl get ns ${BRANCH_NAME} || kubectl create ns ${BRANCH_NAME}
           kubectl --namespace=${BRANCH_NAME} apply -f k8s/lb-service.yaml
           kubectl --namespace=${BRANCH_NAME} apply -f k8s/petclinic-deploy.yaml

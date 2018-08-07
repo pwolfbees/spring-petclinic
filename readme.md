@@ -1,14 +1,10 @@
-# Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=master)](https://travis-ci.org/spring-projects/spring-petclinic/)
+# CloudBees Core Integration Example with GCP Binary Authorization 
 
-## Understanding the Spring Petclinic application with a few diagrams
-<a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
+## CloudBees Core
+<a href="https://www.cloudbees.com/get-started">Get Started</a>
 
-## Running petclinic locally
-```
-	git clone https://github.com/spring-projects/spring-petclinic.git
-	cd spring-petclinic
-	./mvnw spring-boot:run
-```
+## Understanding Binary Authorization
+
 
 You can then access petclinic here: http://localhost:8080/
 
