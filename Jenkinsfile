@@ -21,7 +21,6 @@ pipeline {
     TARGET_CLUSTER = "bin-auth-deploy"  //K8s Cluster where you want to deploy application. Requires Service Account access.
     ATTESTOR = "demo-attestor"
     ATTESTOR_EMAIL = "dattestor@example.com"
-    NOTE_ID = "demo-note"
     NAMESPACE = "${$TAG_NAME ? 'production' : $BRANCH_NAME}"
   }
 
@@ -71,7 +70,7 @@ pipeline {
           gcloud beta container binauthz create-signature-payload --artifact-url="$ARTIFACT_URL" > /tmp/generated_payload.json
           gpg --allow-secret-key-import --import /attestor/dattestor.asc
           gpg --local-user "${ATTESTOR_EMAIL}" --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
-          gcloud beta container binauthz attestations create --artifact-url="$ARTIFACT_URL" --attestor="projects/${TARGET_PROJECT}/notes/${NOTE_ID}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
+          gcloud beta container binauthz attestations create --artifact-url="$ARTIFACT_URL" --attestor="projects/${TARGET_PROJECT}/attestors/${ATTESTOR}}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
           '''
         }
       }
