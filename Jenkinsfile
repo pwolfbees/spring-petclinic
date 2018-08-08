@@ -20,7 +20,9 @@ pipeline {
     TARGET_PROJECT = "cloudbees-public"  //GCP Project where you want to deploy application. Requires Service Account access.
     TARGET_CLUSTER = "bin-auth-deploy"  //K8s Cluster where you want to deploy application. Requires Service Account access.
     ATTESTOR = "demo-attestor"
-    ATTESTOR_EMAIL = "test-attestor@example.com"
+    ATTESTOR_EMAIL = "dattestor@example.com"
+    NOTE_ID = "demo-note"
+    NAMESPACE = "${$TAG_NAME ? 'production' : $BRANCH_NAME}"
   }
 
   stages {
@@ -41,6 +43,7 @@ pipeline {
         container(name:'kaniko', shell:'/busybox/sh') {
           sh '''#!/busybox/sh 
           /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_URL}:${GIT_COMMIT}
+          sed -i.bak "s#REPLACEME#${IMAGE_URL}:${GIT_COMMIT}#" ./k8s/petclinic-deploy.yaml
           '''
         } 
       }
@@ -53,6 +56,7 @@ pipeline {
         container(name:'kaniko', shell:'/busybox/sh') {
           sh '''#!/busybox/sh 
           /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_URL}:${GIT_COMMIT} --destination=${IMAGE_URL}:${TAG_NAME} --destination=${IMAGE_URL}:latest
+          sed -i.bak "s#REPLACEME#${IMAGE_URL}:${TAG_NAME}#" ./k8s/petclinic-deploy.yaml
           '''
         }
       }
@@ -65,9 +69,9 @@ pipeline {
           gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
           ARTIFACT_URL="$(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)')"
           gcloud beta container binauthz create-signature-payload --artifact-url="$ARTIFACT_URL" > /tmp/generated_payload.json
-          gpg --allow-secret-key-import --import /attestor/gpg.asc
+          gpg --allow-secret-key-import --import /attestor/dattestor.asc
           gpg --local-user "${ATTESTOR_EMAIL}" --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
-          gcloud beta container binauthz attestations create --artifact-url="$ARTIFACT_URL" --attestor="projects/${TARGET_PROJECT}/attestors/${ATTESTOR}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --fingerprint)"
+          gcloud beta container binauthz attestations create --artifact-url="$ARTIFACT_URL" --attestor="projects/${TARGET_PROJECT}/notes/${NOTE_ID}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
           '''
         }
       }
@@ -76,10 +80,9 @@ pipeline {
       steps {
         container('kubectl') {
           sh '''
-          sed -i.bak "s#REPLACEME#${IMAGE_URL}:${GIT_COMMIT}#" ./k8s/petclinic-deploy.yaml
-          kubectl get ns ${BRANCH_NAME} || kubectl create ns ${BRANCH_NAME}
-          kubectl --namespace=${BRANCH_NAME} apply -f k8s/lb-service.yaml
-          kubectl --namespace=${BRANCH_NAME} apply -f k8s/petclinic-deploy.yaml
+          kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
+          kubectl --namespace=${NAMESPACE} apply -f k8s/lb-service.yaml
+          kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml
           '''
         }
       }
