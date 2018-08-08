@@ -21,10 +21,20 @@ pipeline {
     TARGET_CLUSTER = "bin-auth-deploy"  //K8s Cluster where you want to deploy application. Requires Service Account access.
     ATTESTOR = "demo-attestor"
     ATTESTOR_EMAIL = "dattestor@example.com"
-    NAMESPACE = "${$TAG_NAME ? 'production' : $BRANCH_NAME}"
+    NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}"
   }
 
   stages {
+    stage('Configure kubectl') {
+      steps {
+        container('gcloud') {
+          sh '''
+          gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
+          gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
+          ''''
+        }
+      }
+    }
     stage('Maven') {
       steps {
         container('maven') {
@@ -60,12 +70,13 @@ pipeline {
         }
       }
     }
-    stage('Create Kubeconfig') {
+    stage('Attest Tagged Image') {
+      when {
+          buildingTag()
+      }
       steps {
         container('gcloud') {
           sh '''
-          gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
-          gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
           ARTIFACT_URL="$(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)')"
           gcloud beta container binauthz create-signature-payload --artifact-url="$ARTIFACT_URL" > /tmp/generated_payload.json
           gpg --allow-secret-key-import --import /attestor/dattestor.asc
