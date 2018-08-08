@@ -61,8 +61,6 @@ pipeline {
       steps {
         container('gcloud') {
           sh '''
-          apt-get update
-          apt-get install gpgv2
           gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
           gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
           ARTIFACT_URL="$(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)')"

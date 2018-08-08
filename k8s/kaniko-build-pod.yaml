@@ -18,7 +18,7 @@ spec:
       - name: shared-root
         mountPath: /root
   - name: gcloud
-    image: gcr.io/cloud-builders/gcloud
+    image: gcr.io/cloudbees-public/tools/gcloud:gpg
     command:
     - cat
     tty: true
@@ -27,6 +27,8 @@ spec:
         mountPath: /root
       - name: jenkins-secret
         mountPath: /secret
+      - name: attestor-secret
+        mountPath: /attestor
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -43,3 +45,6 @@ spec:
     - name: jenkins-secret
       secret:
         secretName: jenkins-secret
+    - name: attestor-secret
+      secret:
+        secretName: attestor-secret
