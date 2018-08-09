@@ -9,8 +9,8 @@ spec:
     command:
     - cat
     tty: true
-  - name: kubectl
-    image: gcr.io/cloud-builders/kubectl
+  - name: gpg
+    image: vladgh/gpg
     command:
     - cat
     tty: true

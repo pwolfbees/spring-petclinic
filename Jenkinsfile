@@ -7,34 +7,30 @@ pipeline {
   }
 
   options {
-      skipDefaultCheckout true //workaround for bug in Kubernetes Plugin JENKINS-52885
+      skipDefaultCheckout true //Workaround for bug in Kubernetes Plugin JENKINS-52885
   }
   
   environment {
-    GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //workaround for bug in Kubernetes Plugin JENKINS-52885
-    GOOGLE_APPLICATION_CREDENTIALS = "/secret/jenkins-secret.json"  // need K8s secret created that contains GCP service account credentials
-    GCR_PROJECT = "cloudbees-public"  //name of GCP project for Kaniko to store images in GCR. Service Account must have access
+    //Env Variables set from ./setup/config.yaml
+    GCR_PROJECT = "${readYaml('.setup/config.yaml').gcr-project}"  
+    TARGET_PROJECT = "${readYaml('.setup/config.yaml').target-project}"  
+    TARGET_CLUSTER = "${readYaml('.setup/config.yaml').target-cluster}"  
+    
+    //Static Env Variables 
     IMAGE_PREFIX = "bin-auth" //name of prefix for container images in GCR to separate from other images
     IMAGE_NAME = "petclinic" //name of image to be created
     IMAGE_URL = "gcr.io/${GCR_PROJECT}/${IMAGE_PREFIX}/${IMAGE_NAME}" //full container image URL without tag
-    TARGET_PROJECT = "cloudbees-public"  //GCP Project where you want to deploy application. Requires Service Account access.
-    TARGET_CLUSTER = "bin-auth-deploy"  //K8s Cluster where you want to deploy application. Requires Service Account access.
-    ATTESTOR = "demo-attestor"
-    ATTESTOR_EMAIL = "dattestor@example.com"
-    NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}"
+    ATTESTOR = "demo-attestor"  //name of the attestor to use
+    ATTESTOR_EMAIL = "dattestor@example.com"  //email of the attestor to use
+    GOOGLE_APPLICATION_CREDENTIALS = "/secret/jenkins-secret.json" //name of the secret file containing service account credentials
+    
+    //Env Variables set by context of running pipeline
+    GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //Workaround for bug in Kubernetes Plugin JENKINS-52885
+    NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}" //Set the k8s namespace to be either production or the branch name
+    DEPLOY_CONTAINER = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
   }
 
   stages {
-    stage('Configure kubectl') {
-      steps {
-        container('gcloud') {
-          sh '''
-          gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
-          gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
-          '''
-        }
-      }
-    }
     stage('Maven') {
       steps {
         container('maven') {
@@ -50,10 +46,7 @@ pipeline {
       }
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
-          sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_URL}:${GIT_COMMIT}
-          sed -i.bak "s#REPLACEME#${IMAGE_URL}:${GIT_COMMIT}#" ./k8s/petclinic-deploy.yaml
-          '''
+          sh "./scripts/kaniko.sh `pwd`/Dockerfile `pwd` ${IMAGE_URL}:${GIT_COMMIT}"
         } 
       }
     }
@@ -63,9 +56,16 @@ pipeline {
       }
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
-          sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --destination=${IMAGE_URL}:${GIT_COMMIT} --destination=${IMAGE_URL}:${TAG_NAME} --destination=${IMAGE_URL}:latest
-          sed -i.bak "s#REPLACEME#${IMAGE_URL}:${TAG_NAME}#" ./k8s/petclinic-deploy.yaml
+          sh "./scripts/kaniko.sh `pwd`/Dockerfile `pwd` ${IMAGE_URL}:${GIT_COMMIT} ${IMAGE_URL}:latest  ${IMAGE_URL}:${TAG_NAME}"
+        }
+      }
+    }
+    stage('Configure kubectl') {
+      steps {
+        container('gcloud') {
+          sh '''
+          gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
+          gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
           '''
         }
       }
@@ -77,7 +77,7 @@ pipeline {
       steps {
         container('gcloud') {
           sh '''
-          ARTIFACT_URL="$(gcloud container images describe ${IMAGE_URL}:${GIT_COMMIT} --format='value(image_summary.fully_qualified_digest)')"
+          ARTIFACT_URL="$(gcloud container images describe ${IMAGE_URL}:${TAG_NAME} --format='value(image_summary.fully_qualified_digest)')"
           gcloud beta container binauthz create-signature-payload --artifact-url="$ARTIFACT_URL" > /tmp/generated_payload.json
           gpg --allow-secret-key-import --import /attestor/dattestor.asc
           gpg --local-user "${ATTESTOR_EMAIL}" --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
@@ -88,8 +88,9 @@ pipeline {
     } 
     stage('Deploy Petclinic') {
       steps {
-        container('kubectl') {
+        container('gcloud') {
           sh '''
+          sh "sed -i.bak "s#REPLACEME#${DEPLOY_CONTAINER}#" ./k8s/petclinic-deploy.yaml"  
           kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
           kubectl --namespace=${NAMESPACE} apply -f k8s/lb-service.yaml
           kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml
