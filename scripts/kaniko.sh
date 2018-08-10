@@ -1,4 +1,4 @@
-# /busybox/sh 
+#!/busybox/sh 
 set -e
 
 if [ $# -ne 3 ];
