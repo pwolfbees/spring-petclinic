@@ -77,7 +77,7 @@ pipeline {
           //gpg --local-user "${ATTESTOR_EMAIL}" --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
           //gcloud beta container binauthz attestations create --artifact-url="$ARTIFACT_URL" --attestor="projects/${TARGET_PROJECT}/attestors/${ATTESTOR}}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
           //'''
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} '/attestor/dattestor.asc' ${ATTESTOR} ${ATTESTOR_EMAIL} ${TARGET_PROJECT} $${DEPLOY_CONTAINER}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} '/attestor/dattestor.asc' ${ATTESTOR} ${ATTESTOR_EMAIL} ${TARGET_PROJECT} ${DEPLOY_CONTAINER}"
         }
       }
     } 
