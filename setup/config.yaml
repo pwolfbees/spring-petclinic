@@ -1,8 +1,0 @@
-
-
-# name of GCP project for Kaniko to store images in GCR. Service Account must have access
-gcr-project: "cloudbees-public"
-#GCP Project where you want to deploy application. Requires Service Account access.
-target-project: "cloudbees-public"
-#K8s Cluster where you want to deploy application. Requires Service Account access.
-target-cluster: "bin-auth-deploy"

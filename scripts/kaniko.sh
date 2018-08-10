@@ -1,7 +1,9 @@
 # /busybox/sh 
+set -e
 
 if [ $# -ne 3 ];
-    then echo "Usage: kaniko.sh -p <path to Dockerfile> <context directory> <image tag 1>...<image tag N>"
+    then echo "Usage: kaniko.sh <path to Dockerfile> <context directory> <image tag 1>...<image tag N>"
+    exit 1
 fi
 
 cmd="/kaniko/executor -f $1 -c $2"
