@@ -12,9 +12,9 @@ pipeline {
   
   environment {
     //Env Variables set from ./setup/config.yaml
-    GCR_PROJECT = "${readYaml('.setup/config.yaml').gcr-project}"  
-    TARGET_PROJECT = "${readYaml('.setup/config.yaml').target-project}"  
-    TARGET_CLUSTER = "${readYaml('.setup/config.yaml').target-cluster}"  
+    GCR_PROJECT = "cloudbees-public" 
+    TARGET_PROJECT = "cloudbees-public"  
+    TARGET_CLUSTER = "cloudbees-public"  
     
     //Static Env Variables 
     IMAGE_PREFIX = "bin-auth" //name of prefix for container images in GCR to separate from other images
@@ -28,6 +28,7 @@ pipeline {
     GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //Workaround for bug in Kubernetes Plugin JENKINS-52885
     NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}" //Set the k8s namespace to be either production or the branch name
     DEPLOY_CONTAINER = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
+    FOO = "${load ./scripts/kanikoBuild.groovy}"
   }
 
   stages {
@@ -90,7 +91,7 @@ pipeline {
       steps {
         container('gcloud') {
           sh '''
-          sh "sed -i.bak "s#REPLACEME#${DEPLOY_CONTAINER}#" ./k8s/petclinic-deploy.yaml"  
+          sed -i.bak "s#REPLACEME#${DEPLOY_CONTAINER}#" ./k8s/petclinic-deploy.yaml  
           kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
           kubectl --namespace=${NAMESPACE} apply -f k8s/lb-service.yaml
           kubectl --namespace=${NAMESPACE} apply -f k8s/petclinic-deploy.yaml
