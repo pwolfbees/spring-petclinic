@@ -46,7 +46,7 @@ pipeline {
       }
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
-          sh "./scripts/kaniko.sh `pwd`/Dockerfile `pwd` ${IMAGE_URL}:${GIT_COMMIT}"
+          sh "#!/busybox/sh ./scripts/kaniko.sh `pwd`/Dockerfile `pwd` ${IMAGE_URL}:${GIT_COMMIT}"
         } 
       }
     }
