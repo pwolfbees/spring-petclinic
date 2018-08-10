@@ -46,7 +46,9 @@ pipeline {
       }
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
-          sh "#!/busybox/sh ./scripts/kaniko.sh `pwd`/Dockerfile `pwd` ${IMAGE_URL}:${GIT_COMMIT}"
+          sh '''#!/busybox/sh 
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` -d ${IMAGE_URL}:${GIT_COMMIT}
+          '''
         } 
       }
     }
@@ -56,7 +58,9 @@ pipeline {
       }
       steps {
         container(name:'kaniko', shell:'/busybox/sh') {
-          sh "./scripts/kaniko.sh `pwd`/Dockerfile `pwd` ${IMAGE_URL}:${GIT_COMMIT} ${IMAGE_URL}:latest  ${IMAGE_URL}:${TAG_NAME}"
+          sh '''#!/busybox/sh 
+          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` -d ${IMAGE_URL}:${GIT_COMMIT} -d ${IMAGE_URL}:latest -d ${IMAGE_URL}:${TAG_NAME}
+          '''
         }
       }
     }
@@ -73,21 +77,22 @@ pipeline {
           //gpg --local-user "${ATTESTOR_EMAIL}" --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
           //gcloud beta container binauthz attestations create --artifact-url="$ARTIFACT_URL" --attestor="projects/${TARGET_PROJECT}/attestors/${ATTESTOR}}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
           //'''
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} '/attestor/dattestor.asc' ${ATTESTOR} ${ATTESTOR_EMAIL} ${TARGET_PROJECT} ${IMAGE_URL}:${TAG_NAME}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} '/attestor/dattestor.asc' ${ATTESTOR} ${ATTESTOR_EMAIL} ${TARGET_PROJECT} $${DEPLOY_CONTAINER}"
         }
       }
     } 
     stage('Deploy Petclinic') {
       steps {
         container('gcloud') {
-          sh '''
-          gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
-          gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_PROJECT} --no-user-output-enabled
-          sed -i.bak "s#REPLACEME#${DEPLOY_CONTAINER}#" ./k8s/deploy/petclinic-app-deploy.yaml  
-          kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
-          kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-service-deploy.yaml  
-          kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-app-deploy.yaml  
-          '''
+          //sh '''
+          //gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --no-user-output-enabled
+          //gcloud container clusters get-credentials ${TARGET_CLUSTER} --zone us-east1-b --project ${TARGET_CLUSTER} --no-user-output-enabled
+          //sed -i.bak "s#REPLACEME#${DEPLOY_CONTAINER}#" ./k8s/deploy/petclinic-app-deploy.yaml  
+          //kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
+          //kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-service-deploy.yaml  
+          //kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-app-deploy.yaml  
+          //'''
+          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TARGET_CLUSTER} ${TARGET_CLUSTER} ${DEPLOY_CONTAINER} ${NAMESPACE}"
         }
       }
     }
