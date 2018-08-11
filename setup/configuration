@@ -1,0 +1,22 @@
+
+###################
+# Mandatory Changes
+###################
+# Projects
+CLOUDBEES_PROJECT_ID="cloudbees-public"
+DEPLOYER_PROJECT_ID="cloudbees-public"
+ATTESTOR_PROJECT_ID="cloudbees-public"
+
+# CloudBees Core settings
+CLOUDBEES_CLUSTER="cloudbees-core"
+CLOUDBEES_NAMESPACE="cloudbees-core"
+
+
+###################
+# Optional Changes
+###################
+# Attestor settings (Optional)
+NOTE_ID="demo-note"
+ATTESTOR_NAME="Demo Attestor"
+ATTESTOR_EMAIL="dattestor@example.com"
+ATTESTOR_ID="demo-attestor"

@@ -9,16 +9,8 @@ spec:
     command:
     - cat
     tty: true
-  - name: gpg
-    image: vladgh/gpg
-    command:
-    - cat
-    tty: true
-    volumeMounts:
-      - name: shared-root
-        mountPath: /root
   - name: gcloud
-    image: gcr.io/cloudbees-public/tools/gcloud:gpg
+    image: docker.io/beedemo/gcloud:gpg
     command:
     - cat
     tty: true
