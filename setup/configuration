@@ -2,19 +2,26 @@
 ###################
 # Mandatory Changes
 ###################
+# These settings must be changed to work in your environment
 # GCP Projects - All three projects may be the same project.
+
 # The project where your Jenknis Agent will run
 CLOUDBEES_PROJECT_ID="cloudbees-public"
+
 # The GCP Project where you will deploy the Petclinic application
 DEPLOYER_PROJECT_ID="cloudbees-public"
+
 # The GCP Project where you will store your Binary Authorization attestations and policies
 ATTESTOR_PROJECT_ID="cloudbees-public"
 
 # GKE settings
+
 # The GKE cluster where your Jenkins Agent will run
 CLOUDBEES_CLUSTER="cloudbees-core"
+
 # The GKE cluster namespace where your Jenkins Agent will run
 CLOUDBEES_NAMESPACE="cloudbees-core"
+
 # The GKE Cluster where you will deploy the Petclinic application
 DEPLOYER_CLUSTER="bin-auth-deploy"
 
@@ -23,6 +30,7 @@ DEPLOYER_CLUSTER="bin-auth-deploy"
 # Optional Changes
 ###################
 # These parameters can optionally be changed.
+
 # The name of the container analysis note to be created
 NOTE_ID="demo-note"
 # The name of the demonstration attestor
