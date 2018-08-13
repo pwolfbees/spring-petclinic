@@ -2,15 +2,11 @@
 
 set -e
 
+cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
+
 . configuration
 
-gcloud config set project $DEPLOYER_PROJECT_ID
-
-# ensure that the required apis are enabled
-echo "Enabling required apis on project"
-gcloud services enable container.googleapis.com containeranalysis.googleapis.com binaryauthorization.googleapis.com
-
-./container-analysis-setup.sh
+./binary-authorization-setup.sh
 ./cloudbees-setup.sh
 ./jenkinsfile-setup.sh
 ./cleansh.sh

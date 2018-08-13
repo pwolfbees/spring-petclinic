@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
+cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 . configuration
 

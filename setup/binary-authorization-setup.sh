@@ -1,6 +1,7 @@
-#!/bin/sh
-set -e
+#!/bin/bash
 
+set -e
+cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 # Refer to latest Documentation for help
 # https://cloud.google.com/binary-authorization/docs/creating-attestors
@@ -10,7 +11,7 @@ set -e
 echo "Setting gcloud project context to ${DEPLOYER_PROJECT_ID}"
 gcloud config set project ${DEPLOYER_PROJECT_ID}
 echo "Enabling required apis on project"
-gcloud services enable container.googleapis.com containeranalysis.googleapis.com binaryauthorization.googleapis.com
+#gcloud services enable container.googleapis.com containeranalysis.googleapis.com binaryauthorization.googleapis.com
 
 # Get Service Accounts for Deployer Project and Attestor Project to enable binary authorization service
 DEPLOYER_PROJECT_NUMBER=$(gcloud projects describe "${DEPLOYER_PROJECT_ID}" --format="value(projectNumber)")
@@ -79,34 +80,28 @@ curl -X POST  \
 
 echo "Setting up Attestor"
 
-echo "Generating public and private key for attestor account $ATTESTOR_EMAIL"
+echo "Generating public and private key for attestor account ${ATTESTOR_EMAIL}"
 gpg --batch --gen-key <(
-  cat <<- EOF
+  cat << EOM
     Key-Type: RSA
     Key-Length: 2048
     Name-Real: "${ATTESTOR_NAME}"
     Name-Email: "${ATTESTOR_EMAIL}"
+    Passphrase: ""
     %commit
-EOF
+EOM
 )
 
 echo "Exporting private and public keys for Attestor"
-gpg --export-secret-key -a ${ATTESTOR_NAME} > /tmp/${ATTESTOR_ID}.key
+gpg --armor --export-secret-key "${ATTESTOR_NAME} <${ATTESTOR_EMAIL}>" > /tmp/${ATTESTOR_ID}.key
 gpg --armor --export ${ATTESTOR_EMAIL} > /tmp/${ATTESTOR_ID}-pub.pgp
 
 # Create Attestor in Attestor Project
 echo "Creating new Attestor"
-gcloud --project=${ATTESTOR_PROJECT_ID} \
-  beta container binauthz attestors create ${ATTESTOR_ID} \
+gcloud beta container binauthz attestors create ${ATTESTOR_ID} \
+  --project=${ATTESTOR_PROJECT_ID} \
   --attestation-authority-note=${NOTE_ID} \
   --attestation-authority-note-project=${ATTESTOR_PROJECT_ID}
-
-# Grant permission for Deployer Service account to verify containers
-echo "Granting permission for Deployer service account to verify contiainer"
-gcloud beta container binauthz attestors set-iam-policy \
-  "projects/${ATTESTOR_PROJECT_ID}/attestors/${ATTESTOR_ID}" \
-  --member="serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}" \
-  --role=roles/binaryauthorization.attestorsVerifier
 
 # Add public key for Attestor
 echo "Adding public key for Attestor"
@@ -114,3 +109,34 @@ gcloud --project=${ATTESTOR_PROJECT_ID} \
   beta container binauthz attestors public-keys add \
   --attestor=${ATTESTOR_ID} \
   --public-key-file=/tmp/$ATTESTOR_ID-pub.pgp
+
+# Create IAM policy for Deployer Service Account to verify from Attestor.
+# Note: glcoud command from documents does not work correctly
+#
+# https://cloud.google.com/binary-authorization/docs/creating-attestors
+#
+# gcloud beta container binauthz attestors set-iam-policy \
+# "projects/${ATTESTOR_PROJECT_ID}/attestors/my-attestor" \
+#  --member="serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}" \
+#  --role=roles/binaryauthorization.attestorsVerifier
+#  
+# --member and --role are not recognized. set-iam-policy expects json file
+
+cat > /tmp/verifier_iam_policy.json << EOM
+  {
+    "bindings": [
+      {
+        "role": "roles/binaryauthorization.attestorsVerifier",
+        "members": [
+          "serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}"
+        ]
+      }
+    ] 
+  }
+EOM
+
+# Grant permission for Deployer Service account to verify containers
+echo "Granting permission for Deployer service account to verify contiainer"
+gcloud beta container binauthz attestors set-iam-policy \
+  "projects/${ATTESTOR_PROJECT_ID}/attestors/${ATTESTOR_ID}" \
+  /tmp/verifier_iam_policy.json

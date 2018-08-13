@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -14,6 +14,7 @@ gpg --batch --gen-key <(
     Key-Length: 2048
     Name-Real: "${ATTESTOR_NAME}"
     Name-Email: "${ATTESTOR_EMAIL}"
+     Passphrase: ""
     %commit
 EOF
 )
