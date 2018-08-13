@@ -30,21 +30,23 @@ These items must be available to run this demonstration.
 ## Running the Demo
 
 ### Simple Installation
-This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads. The setup process will create several items in your GCP project including: container analysis note, attestor, service account 
+All of the setps needed to set up this demonstration are provided in the _setup_ directory. This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads. The setup process will create several items in your GCP project including: container analysis note, attestor, service account 
 
 #### Steps:
-1. Fork and clone this repository 
-2. Edit ./setup/configuration 
-* **configuration** - 
-3. Run ./setup/setup.sh - this script will make several changes to your GCP Project and create a Jenkinsfile for you.
+1. Fork and clone this repository
+2. Edit [setup/configuration ](./setup/configuration)
+3. Run [setup/setup.sh](./setup/setup.sh) - this script will make several changes to your GCP Project and create a Jenkinsfile for you.
 4. Commit and Push changes back to your repository
 5. Create a [Multibranch Pipeline](https://jenkins.io/doc/book/pipeline/multibranch/) in Jenkins for your repository and enable [Tag Discovery](https://jenkins.io/blog/2018/05/16/pipelines-with-git-tags/) 
 
 ### Setup scripts
 The setup.sh script runs multiple scripts to set up a particular part of the demonstration. Each of these scripts can also be run independently if you want to have more control of the installation or skip different steps.
 
-
-* **container-analysis-setup** - In order for Binary Authorization to work  
+  * [container-analysis-setup](./setup/container-analysis-setup.sh) - In order for Binary Authorization to work  
+  * [attestor-setup](./setup/attestor-setup.sh)
+  * [cloudbees-setup](./setup/cloudbees-setup.sh)
+  * [jenkinsfile-setup](./setup/jenkinsfile-setup.sh)
+  * [cleanup](./setup/cleanup.sh)
 
 
 
