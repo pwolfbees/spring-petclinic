@@ -19,7 +19,7 @@ These items must be available to run this demonstration.
   This demonstration was built to run on GCP specifically. Substitutions for any component will require changes to the demonstration.
     * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) - At least one Kubernetes cluster must be available to deploy application and for running pipeline. 
     * [Google Container Registry](https://cloud.google.com/container-registry/docs/quickstart) - The application container image will be uploaded to GCR for verification and deployed from GCR.
-  * CloudBees Core 
+  * CloudBees Core
   This demonstration was built using CloudBees Core running on GKE. You can quickly install [CloudBees Core on GKE](https://console.cloud.google.com/marketplace/details/cloudbees/cloudbees-core) using the GCP Marketplace.
     * Plugins required
       * [Pipeline Plugin](https://plugins.jenkins.io/workflow-aggregator)
