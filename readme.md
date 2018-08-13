@@ -14,26 +14,18 @@ Choices were made in the Jenknisfile Pipeline for this application to highlight 
 ## Prerequisites
 These items must be available to run this demonstration. 
 
-1. Cloud Environment
-  * Google Cloud Platform (GCP) Project
-  
-  This demonstration was built to run on GCP specifically. Substitutions for any component will require changes to the demonstration.
+1. __Cloud Environment__
+  * __Google Cloud Platform (GCP) Project__ This demonstration was built to run on GCP specifically. Substitutions for any component will require changes to the demonstration.
     * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) - At least one Kubernetes cluster must be available to deploy application and for running pipeline. 
     * [Google Container Registry](https://cloud.google.com/container-registry/docs/quickstart) - The application container image will be uploaded to GCR for verification and deployed from GCR.
-  * CloudBees Core
-
-  This demonstration was built using CloudBees Core running on GKE. You can quickly install [CloudBees Core on GKE](https://console.cloud.google.com/marketplace/details/cloudbees/cloudbees-core) using the GCP Marketplace.
+  * __CloudBees Core__ This demonstration was built using CloudBees Core running on GKE. You can quickly install [CloudBees Core on GKE](https://console.cloud.google.com/marketplace/details/cloudbees/cloudbees-core) using the GCP Marketplace.
     * Plugins required
       * [Pipeline Plugin](https://plugins.jenkins.io/workflow-aggregator)
       * [Kubernetes Plugin](https://plugins.jenkins.io/kubernetes)
       * [Workspace Cleanup Plugin](https://plugins.jenkins.io/ws-cleanup)
-  * GitHub or Bitbucket account
-
-  It is highly recommended to use GitHub, Bitbucket or Gitea support for this demonstration because they have support for Tags. For Gitea you will need to make sure it is available on the internet.
+  * __GitHub or Bitbucket account__ It is highly recommended to use GitHub, Bitbucket or Gitea support for this demonstration because they have support for Tags. For Gitea you will need to make sure it is available on the internet.
 
 2. Local Tools
-
-The following tools are required to configure your GCP project and create the required cryptography keys.
   * Linux or OS-X (for setup) - The setup scripts provided will only work on Linux or OS-X
   * [gcloud](https://cloud.google.com/sdk/install)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
