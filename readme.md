@@ -1,8 +1,18 @@
-# CloudBees Core() Integration with Binary Authorization 
+# CloudBees Core Integration with Binary Authorization on Google Cloud Platform
 
-This demonstration application [CloudBees Core](https://www.cloudbees.com/get-started) with Google Cloud's [Binary Authorization](https://cloud.google.com/binary-authorization). 
+This application demonstrates how to use Google Cloud's [Binary Authorization](https://cloud.google.com/binary-authorization) to validate and approve container images before deploying them to Google Kubernetes Engine (GKE) with [CloudBees Core](https://www.cloudbees.com/get-started). 
+
+The demonstration used the [Spring Petclinic](https://github.com/spring-projects/spring-petclinic) application as a sample application but the same methodology would apply to any application that is being deploying on Kubernetes.
+
+## Goals
+Choices were made in the Jenknisfile Pipeline for this application to highlight several features but are not the only way to accomplish this integration. 
+
+* Provide an extensible integration that can be used for different combinations of CloudBees Core and GCP. E.g. Multiple Projects, Multiple Namespaces.
+* Provide compartmentalized steps that can be used independently in different Jenkins Pipelines. E.g. Kaniko build, Attestation Signing.
+* Demonstrate conditional flow control of Jenknis Declarative Pipeline using _environment_ and _when_ based on presence of git tags. 
 
 ## Prerequisites
+These items must be available to run this demonstration. 
 
 1. Cloud Environment
   * Google Cloud Platform (GCP) Project
