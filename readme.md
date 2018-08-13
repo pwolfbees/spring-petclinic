@@ -16,29 +16,34 @@ These items must be available to run this demonstration.
 
 1. Cloud Environment
   * Google Cloud Platform (GCP) Project
-  * CloudBees Core or Jenkins 
+  This demonstration was built to run on GCP specifically. Substitutions for any component will require changes to the demonstration.
+    * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) - At least one Kubernetes cluster must be available to deploy application and for running pipeline. 
+    * [Google Container Registry](https://cloud.google.com/container-registry/docs/quickstart) - The application container image will be uploaded to GCR for verification and deployed from GCR.
+  * CloudBees Core 
+  This demonstration was built using CloudBees Core running on GKE. You can quickly install [CloudBees Core on GKE] (https://console.cloud.google.com/marketplace/details/cloudbees/cloudbees-core) using the GCP Marketplace.
     * Plugins required
       * [Pipeline Plugin](https://plugins.jenkins.io/workflow-aggregator)
       * [Kubernetes Plugin](https://plugins.jenkins.io/kubernetes)
       * [Workspace Cleanup Plugin](https://plugins.jenkins.io/ws-cleanup)
 
-1. Tools 
-  * Linux or OSX
-  * gcloud
-  * gpg
+2. Tools 
+  * Linux or OS-X (for setup) - The setup scripts provided will only work on Linux or OS-X
+  * [gcloud](https://cloud.google.com/sdk/install)
+  * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+  * [gpg2](https://gnupg.org/download/)
 
 ## Running the Demo
 
 ### Simple Installation
-This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads.
+This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads. The setup process will create several items in your GCP project including: container analysis note, attestor, service account 
 
 #### Steps:
-1. Fork and clone this repository
-1. Edit ./setup/configuration 
+1. Fork and clone this repository - It is highly recommended to use GitHub, Bitbucket or Gitea support for this demonstration because they have support for Tags.
+2. Edit ./setup/configuration 
 * **configuration** - 
-1. Run ./setup/setup.sh
-1. Commit and Push changes back to your repository
-1. Create a [Multibranch Pipeline](https://jenkins.io/doc/book/pipeline/multibranch/) in Jenkins for your repository and enable [Tag Discovery](https://jenkins.io/blog/2018/05/16/pipelines-with-git-tags/) 
+3. Run ./setup/setup.sh - this script will make several changes to your GCP Project and create a Jenkinsfile for you.
+4. Commit and Push changes back to your repository
+5. Create a [Multibranch Pipeline](https://jenkins.io/doc/book/pipeline/multibranch/) in Jenkins for your repository and enable [Tag Discovery](https://jenkins.io/blog/2018/05/16/pipelines-with-git-tags/) 
 
 ### Setup scripts
 The setup.sh script runs multiple scripts to set up a particular part of the demonstration. Each of these scripts can also be run independently if you want to have more control of the installation or skip different steps.
