@@ -9,3 +9,7 @@ rm /tmp/$ATTESTOR_ID.key \
   /tmp/note_payload.json \
   /tmp/cloudbees-svc-acct.json \
 
+# remove gpg keys for attestor
+gpg --delete-secret-key "${ATTESTOR_NAME}" 
+gpg --delete-key "${ATTESTOR_NAME}"
+

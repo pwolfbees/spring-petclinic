@@ -17,7 +17,7 @@ spec:
     volumeMounts:
       - name: shared-root
         mountPath: /root
-      - name: jenkins-secret
+      - name: cloudbees-svc-acct-secret
         mountPath: /secret
       - name: attestor-secret
         mountPath: /attestor
@@ -28,15 +28,15 @@ spec:
     - /busybox/cat
     tty: true
     volumeMounts:
-      - name: jenkins-secret
+      - name: cloudbees-svc-acct-secret
         mountPath: /secret
   restartPolicy: Never
   volumes:
     - name: shared-root
       emptyDir: {}
-    - name: jenkins-secret
+    - name: cloudbees-svc-acct-secret
       secret:
-        secretName: jenkins-secret
+        secretName: cloudbees-svc-acct-secret
     - name: attestor-secret
       secret:
         secretName: attestor-secret

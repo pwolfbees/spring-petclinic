@@ -7,10 +7,15 @@ if [ $# -ne 5 ];
 fi
 
 # args
-CLOUDBEES_SVC_ACCT=$1 
-TARGET_CLUSTER=$2 
+# 1 path to service account that has access to deploy 
+CLOUDBEES_SVC_ACCT=$1
+# 2 name of the cluster where the application will be deployed 
+TARGET_CLUSTER=$2
+# 3 name of the GCP project where the applicaiton will be deployed 
 TARGET_PROJECT=$3
+# Full Name and tag of the Container Image to be deployed
 DEPLOY_IMAGE=$4
+# 5 Namespace of the Target Cluster to deploy application to
 NAMESPACE=$5
 
 # authenticate service accout with required permissions to sign attestation

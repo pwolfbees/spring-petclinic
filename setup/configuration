@@ -5,12 +5,12 @@
 # Projects
 CLOUDBEES_PROJECT_ID="cloudbees-public"
 DEPLOYER_PROJECT_ID="cloudbees-public"
+DEPLOYER_CLUSTER="bin-auth-deploy"
 ATTESTOR_PROJECT_ID="cloudbees-public"
 
 # CloudBees Core settings
 CLOUDBEES_CLUSTER="cloudbees-core"
 CLOUDBEES_NAMESPACE="cloudbees-core"
-
 
 ###################
 # Optional Changes

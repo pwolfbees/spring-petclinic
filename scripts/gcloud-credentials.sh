@@ -1,13 +1,15 @@
 #!/bin/sh
 set -e
 
-# args
-# 1 path to service account that has access to deploy
 
 if [ $# -ne 1 ];
     then echo "Usage: gcloud-credentials.sh <path to service acct key>"
     exit 1
 fi
+
+# args
+# 1 path to service account that has access to deploy
+$SVC_ACCT=$1
 
 #check if gcloud is installed and install it if not
 if ! ( hash gcloud 2>/dev/null ); then
@@ -18,4 +20,4 @@ if ! ( hash gcloud 2>/dev/null ); then
 fi
 
 #authenticate service accout with required permissions to sign attestation
-gcloud auth activate-service-account --key-file=$1 --no-user-output-enabled
+gcloud auth activate-service-account --key-file=$SVC_ACCT --no-user-output-enabled
