@@ -1,6 +1,6 @@
 # CloudBees Core Integration with Binary Authorization
 
-This application demonstrates how to use Google Cloud's [Binary Authorization](https://cloud.google.com/binary-authorization) to validate and approve container images before deploying them to Google Kubernetes Engine (GKE) with [CloudBees Core](https://www.cloudbees.com/get-started). 
+This application demonstrates how to use Google Cloud's [Binary Authorization](https://cloud.google.com/binary-authorization/docs/overview) to validate and approve container images before deploying them to Google Kubernetes Engine (GKE) with [CloudBees Core](https://www.cloudbees.com/get-started). 
 
 The demonstration used the [Spring Petclinic](https://github.com/spring-projects/spring-petclinic) application as a sample application but the same methodology would apply to any application that is being deploying on Kubernetes.
 
@@ -30,7 +30,7 @@ These items must be available to run this demonstration.
 ## Running the Demo
 
 ### Simple Installation
-All of the setps needed to set up this demonstration are provided in the _setup_ directory. This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads. The setup process will create several items in your GCP project including: container analysis note, attestor, service account 
+All of the setps needed to set up this demonstration are provided in the _setup_ directory. This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads. The setup process will create several items in your GCP project including: [container analysis note](https://cloud.google.com/container-analysis/api/reference/rest/v1alpha1/projects.notes),[attestor](https://cloud.google.com/binary-authorization/docs/key-concepts#attestors) and a [service account](https://cloud.google.com/iam/docs/understanding-service-accounts).
 
 #### Steps:
 1. Fork and clone this repository
@@ -42,7 +42,7 @@ All of the setps needed to set up this demonstration are provided in the _setup_
 ### Setup scripts
 The setup.sh script runs multiple scripts to set up a particular part of the demonstration. Each of these scripts can also be run independently if you want to have more control of the installation or skip different steps.
 
-  * [container-analysis-setup](./setup/container-analysis-setup.sh) - In order for Binary Authorization to work  
+  * [container-analysis-setup](./setup/container-analysis-setup.sh) -  
   * [attestor-setup](./setup/attestor-setup.sh)
   * [cloudbees-setup](./setup/cloudbees-setup.sh)
   * [jenkinsfile-setup](./setup/jenkinsfile-setup.sh)

@@ -7,7 +7,7 @@ set -e
 
 . configuration
 
-echo "generating public and private key for attestor account $ATTESTOR_EMAIL"
+echo "Generating public and private key for attestor account $ATTESTOR_EMAIL"
 gpg --batch --gen-key <(
   cat <<- EOF
     Key-Type: RSA
@@ -18,15 +18,18 @@ gpg --batch --gen-key <(
 EOF
 )
 
-echo "exporting attestor keys"
+echo "Exporting private and public keys for Attestor"
 gpg --export-secret-key -a ${ATTESTOR_NAME} > /tmp/${ATTESTOR_ID}.key
 gpg --armor --export ${ATTESTOR_EMAIL} > /tmp/${ATTESTOR_ID}-pub.pgp
 
+# Create Attestor in Attestor Project
+echo "Creating new Attestor"
 gcloud --project=${ATTESTOR_PROJECT_ID} \
   beta container binauthz attestors create ${ATTESTOR_ID} \
   --attestation-authority-note=${NOTE_ID} \
   --attestation-authority-note-project=${ATTESTOR_PROJECT_ID}
 
+# Granting permission for Deployer 
 gcloud beta container binauthz attestors set-iam-policy \
   "projects/${ATTESTOR_PROJECT_ID}/attestors/${ATTESTOR_ID}" \
   --member="serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}" \

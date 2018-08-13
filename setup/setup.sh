@@ -11,6 +11,6 @@ echo "Enabling required apis on project"
 gcloud services enable container.googleapis.com containeranalysis.googleapis.com binaryauthorization.googleapis.com
 
 ./container-analysis-setup.sh
-./attestor-setup.sh
 ./cloudbees-setup.sh
+./jenkinsfile-setup.sh
 ./cleansh.sh
