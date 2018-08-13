@@ -20,13 +20,16 @@ These items must be available to run this demonstration.
     * [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/) - At least one Kubernetes cluster must be available to deploy application and for running pipeline. 
     * [Google Container Registry](https://cloud.google.com/container-registry/docs/quickstart) - The application container image will be uploaded to GCR for verification and deployed from GCR.
   * CloudBees Core 
-  This demonstration was built using CloudBees Core running on GKE. You can quickly install [CloudBees Core on GKE] (https://console.cloud.google.com/marketplace/details/cloudbees/cloudbees-core) using the GCP Marketplace.
+  This demonstration was built using CloudBees Core running on GKE. You can quickly install [CloudBees Core on GKE](https://console.cloud.google.com/marketplace/details/cloudbees/cloudbees-core) using the GCP Marketplace.
     * Plugins required
       * [Pipeline Plugin](https://plugins.jenkins.io/workflow-aggregator)
       * [Kubernetes Plugin](https://plugins.jenkins.io/kubernetes)
       * [Workspace Cleanup Plugin](https://plugins.jenkins.io/ws-cleanup)
+  * GitHub or Bitbucket account 
+  It is highly recommended to use GitHub, Bitbucket or Gitea support for this demonstration because they have support for Tags. For Gitea you will need to make sure it is available on the internet.
 
-2. Tools 
+2. Tools
+The following tools are required to configure your GCP project and create the required cryptography keys.
   * Linux or OS-X (for setup) - The setup scripts provided will only work on Linux or OS-X
   * [gcloud](https://cloud.google.com/sdk/install)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
@@ -38,7 +41,7 @@ These items must be available to run this demonstration.
 This setup assumes that you have a GCP project available for testing that can be cleaned up easily and not affect other workloads. The setup process will create several items in your GCP project including: container analysis note, attestor, service account 
 
 #### Steps:
-1. Fork and clone this repository - It is highly recommended to use GitHub, Bitbucket or Gitea support for this demonstration because they have support for Tags.
+1. Fork and clone this repository 
 2. Edit ./setup/configuration 
 * **configuration** - 
 3. Run ./setup/setup.sh - this script will make several changes to your GCP Project and create a Jenkinsfile for you.
