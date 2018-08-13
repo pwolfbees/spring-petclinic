@@ -99,7 +99,7 @@ pipeline {
   }
   post {
     always {
-      cleanWs()
+      deleteDir()
     }
   }
 }
