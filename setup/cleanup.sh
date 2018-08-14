@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 . configuration
@@ -16,7 +15,10 @@ rm /tmp/$ATTESTOR_ID.key \
 
 # remove gpg keys for attestor
 echo "Removing GPG key created by setup for demonstration"
-FINGERPRINT="$(gpg --with-colons --fingerprint $ATTESTOR_EMAIL | awk -F: '$1 == "fpr" {print $10;exit}')"
-gpg --delete-secret-keys --yes --batch "${FINGERPRINT}"
-gpg --delete-key --batch "${FINGERPRINT}"
+while 
+  FINGERPRINT="$(gpg --with-colons --fingerprint $ATTESTOR_EMAIL | awk -F: '$1 == "fpr" {print $10;exit}')"
+  gpg --delete-secret-keys --yes --batch "${FINGERPRINT}"
+  gpg --delete-key --batch "${FINGERPRINT}"
+do :;
+done
 

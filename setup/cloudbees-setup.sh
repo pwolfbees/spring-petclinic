@@ -27,6 +27,10 @@ echo "Enabling Service Account to push containers to GCR on your behalf"
 gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
   --member serviceAccount:${SERVICE_ACCOUNT} --role roles/storage.admin
 
+echo "Enabling Service Account to deploy Applications to cluster ${DEPLOYER_CLUSTER} on project ${DEPLOYER_PROJECT_ID}"
+gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
+  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/container.developer
+
 # Download a local json key file for use with service account. This key will be used to create a secret on 
 # Kubernetes cluster and deleted when setup is done.
 echo "Creating local json file for ${SERVICE_ACCOUNT} to be used in K8s secret"
