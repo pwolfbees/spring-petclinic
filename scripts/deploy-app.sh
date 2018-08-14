@@ -6,9 +6,18 @@ if [ $# -ne 5 ];
     exit 1
 fi
 
+#check if gcloud is installed and install it if not
+if ! ( hash gcloud 2>/dev/null ); then
+  export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+  apt-get update && apt-get install google-cloud-sdk -y
+fi
+
+
 # args
 # 1 path to service account that has access to deploy 
-CLOUDBEES_SVC_ACCT=$1
+CLOUDBEES_SVC_ACCT_KEY=$1
 # 2 name of the cluster where the application will be deployed 
 TARGET_CLUSTER=$2
 # 3 name of the GCP project where the applicaiton will be deployed 
@@ -18,8 +27,8 @@ DEPLOY_IMAGE=$4
 # 5 Namespace of the Target Cluster to deploy application to
 NAMESPACE=$5
 
-# authenticate service accout with required permissions to sign attestation
-./gcloud-credentials.sh $CLOUDBEES_SVC_ACCT
+#authenticate service accout with required permissions to deploy application
+gcloud auth activate-service-account --key-file=$CLOUDBEES_SVC_ACCT_KEY --no-user-output-enabled 
 # configure and apply the proper context for kubectl
 gcloud container clusters get-credentials $TARGET_CLUSTER  --project $TARGET_PROJECT --no-user-output-enabled
 # update the deployment yaml with the image to be deployed
