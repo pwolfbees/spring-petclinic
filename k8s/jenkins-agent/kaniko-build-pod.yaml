@@ -24,6 +24,7 @@ spec:
     imagePullPolicy: Always
     command:
     - /busybox/cat
+    tty: true
     volumeMounts:
       - name: cloudbees-secret
         mountPath: /secret
