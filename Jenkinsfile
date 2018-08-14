@@ -19,7 +19,6 @@ pipeline {
     ATTESTOR_EMAIL = "dattestor@example.com"  
     
     //Static Env Variables
-    //GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
     IMAGE_PREFIX = "bin-auth" //name of prefix for container images in GCR to separate from other images
     IMAGE_NAME = "petclinic" //name of image to be created
     IMAGE_URL = "gcr.io/${DEPLOYER_PROJECT_ID}/${IMAGE_PREFIX}/${IMAGE_NAME}" //full container image URL without tag
@@ -31,13 +30,6 @@ pipeline {
   }
 
   stages {
-    stage('Maven') {
-      steps {
-        container('maven') {
-          sh 'mvn clean install'
-        }
-      }
-    }
     stage('Create Branch Image') {
       when {
         not {
@@ -50,35 +42,6 @@ pipeline {
           /kaniko/executor -f `pwd`/Dockerfile -c `pwd` -d ${IMAGE_URL}:${GIT_COMMIT}
           '''
         } 
-      }
-    }
-    stage('Create Production Image') {
-      when {
-          buildingTag()
-      }
-      steps {
-        container(name:'kaniko', shell:'/busybox/sh') {
-          sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` -d ${IMAGE_URL}:${GIT_COMMIT} -d ${IMAGE_URL}:latest -d ${IMAGE_URL}:${TAG_NAME}
-          '''
-        }
-      }
-    }
-    stage('Attest Tagged Image') {
-      when {
-          buildingTag()
-      }
-      steps {
-        container('gcloud') {
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} '/attestor/dattestor.asc' ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_CONTAINER}"
-        }
-      }
-    } 
-    stage('Deploy Petclinic') {
-      steps {
-        container('gcloud') {
-          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TARGET_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOY_IMAGE} ${NAMESPACE}"
-        }
       }
     }
   }

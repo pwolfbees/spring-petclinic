@@ -4,23 +4,6 @@ metadata:
   name: kaniko-build-pod
 spec:
   containers:
-  - name: maven
-    image: maven:3.5.0
-    command:
-    - cat
-    tty: true
-  - name: gcloud
-    image: docker.io/beedemo/gcloud:gpg
-    command:
-    - cat
-    tty: true
-    volumeMounts:
-      - name: shared-root
-        mountPath: /root
-      - name: cloudbees-secret
-        mountPath: /secret
-      - name: attestor-secret
-        mountPath: /attestor
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -34,11 +17,6 @@ spec:
         mountPath: /secret
   restartPolicy: Never
   volumes:
-    - name: shared-root
-      emptyDir: {}
     - name: cloudbees-secret
       secret:
         secretName: cloudbees-secret
-    - name: attestor-secret
-      secret:
-        secretName: attestor-secret
