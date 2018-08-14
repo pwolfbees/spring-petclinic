@@ -78,6 +78,7 @@ pipeline {
     stage('Deploy Petclinic') {
       steps {
         container('gcloud') {
+          sh 'echo `pwd`'
           sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOY_IMAGE} ${NAMESPACE}"
         }
       }
