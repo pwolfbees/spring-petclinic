@@ -2,7 +2,36 @@ pipeline {
   agent {
     kubernetes {
         label 'petclinic'
-        yamlFile 'k8s/jenkins-agent/kaniko-build-pod.yaml'
+        yaml ''' 
+        apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-build-pod
+spec:
+  containers:
+  - name: maven
+    image: maven:3.5.0
+    command:
+    - cat
+    tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    env:
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        value: /secret/cloudbees-secret.json
+    volumeMounts:
+      - name: cloudbees-secret
+        mountPath: /secret
+  restartPolicy: Never
+  volumes:
+    - name: cloudbees-secret
+      secret:
+        secretName: cloudbees-secret
+        '''
     }
   }
 
@@ -30,6 +59,13 @@ pipeline {
   }
 
   stages {
+    stage('Maven') {
+      steps {
+        container('maven') {
+          sh 'mvn clean install'
+        }
+      }
+    }
     stage('Create Branch Image') {
       when {
         not {
