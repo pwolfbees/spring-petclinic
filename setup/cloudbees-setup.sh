@@ -50,6 +50,6 @@ gcloud container clusters get-credentials ${CLOUDBEES_CLUSTER} \
 # Add Kubernetes secrets that contain the service account id and private signing key that can be used from Jenkins Pipeline. 
 # This will update an existing secret if it already exists
 echo "Creating Kubernetes secrets for Service Account and Attestor"
-kubectl create secret generic cloudbees-svc-acct-secret --from-file=/tmp/cloudbees-secret.json -n ${CLOUDBEES_NAMESPACE} --dry-run -o yaml | kubectl apply -f -
+kubectl create secret generic cloudbees-secret --from-file=/tmp/cloudbees-secret.json -n ${CLOUDBEES_NAMESPACE} --dry-run -o yaml | kubectl apply -f -
 kubectl create secret generic attestor-secret --from-file=/tmp/${ATTESTOR_ID}.key -n ${CLOUDBEES_NAMESPACE} --dry-run -o yaml | kubectl apply -f -
 
