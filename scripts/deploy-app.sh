@@ -28,9 +28,9 @@ DEPLOY_IMAGE=$4
 NAMESPACE=$5
 
 #authenticate service accout with required permissions to deploy application
-gcloud auth activate-service-account --key-file=$CLOUDBEES_SVC_ACCT_KEY --no-user-output-enabled 
+gcloud auth activate-service-account --key-file=$CLOUDBEES_SVC_ACCT_KEY #--no-user-output-enabled 
 # configure and apply the proper context for kubectl
-gcloud container clusters get-credentials $TARGET_CLUSTER  --project $TARGET_PROJECT --no-user-output-enabled
+gcloud container clusters get-credentials $TARGET_CLUSTER  --project $TARGET_PROJECT #--no-user-output-enabled
 # update the deployment yaml with the image to be deployed
 sed -i.bak "s#REPLACEME#$DEPLOY_IMAGE#" ./k8s/deploy/petclinic-app-deploy.yaml  
 # make sure the namepsace exists and create it if doesn't
