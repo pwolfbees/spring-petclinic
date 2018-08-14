@@ -14,7 +14,7 @@ pipeline {
     //Env Variables that must be set before first run
     ATTESTOR_PROJECT_ID = "cloudbees-public"
     DEPLOYER_PROJECT_ID = "cloudbees-public"  
-    DEPLOYER_CLUSTER = "bin-auth-deploy" 
+    DEPLOYER_CLUSTER = "cloudbees-public" 
     DEPLOYER_CLUSTER_ZONE="us-east1-b"
     ATTESTOR = "demo-attestor"  //name of the attestor to use
     ATTESTOR_EMAIL = "dattestor@example.com"
