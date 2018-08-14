@@ -16,7 +16,8 @@ pipeline {
     DEPLOYER_PROJECT_ID = "REPLACE_DEPLOYER_PROJECT_ID"  
     DEPLOYER_CLUSTER = "REPLACE_DEPLOYER_CLUSTER" 
     ATTESTOR = "REPLACE_ATTESTOR_ID"  //name of the attestor to use
-    ATTESTOR_EMAIL = "REPLACE_ATTESTOR_EMAIL"  
+    ATTESTOR_EMAIL = "REPLACE_ATTESTOR_EMAIL"
+    ATTESTOR_KEY = "${ATTESTOR}.key" 
     
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
@@ -70,14 +71,14 @@ pipeline {
       }
       steps {
         container('gcloud') {
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} '/attestor/dattestor.asc' ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_CONTAINER}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_CONTAINER}"
         }
       }
     } 
     stage('Deploy Petclinic') {
       steps {
         container('gcloud') {
-          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TARGET_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOY_IMAGE} ${NAMESPACE}"
+          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOY_IMAGE} ${NAMESPACE}"
         }
       }
     }
