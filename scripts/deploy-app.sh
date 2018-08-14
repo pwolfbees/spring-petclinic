@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-if [ $# -ne 5 ];
-    then echo "Usage: deploy-app.sh <path to service acct key> <path to attestor private key> <attestor name> <attestor email> <attestation project> <image:tag>"
+if [ $# -ne 6 ];
+    then echo "Usage: deploy-app.sh <Path to SVC ACCT Key> <Target Cluster> <Target Project> <Target Zone> <Image> <Namespace>"
     exit 1
 fi
 
