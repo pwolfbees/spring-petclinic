@@ -14,7 +14,8 @@ pipeline {
     //Env Variables that must be set before first run
     ATTESTOR_PROJECT_ID = "cloudbees-public"
     DEPLOYER_PROJECT_ID = "cloudbees-public"  
-    DEPLOYER_CLUSTER = "cloudbee" 
+    DEPLOYER_CLUSTER = "bin-auth-deploy" 
+    DEPLOYER_CLUSTER_ZONE="us-east1-b"
     ATTESTOR = "demo-attestor"  //name of the attestor to use
     ATTESTOR_EMAIL = "dattestor@example.com"
     ATTESTOR_KEY = "${ATTESTOR}.key" 
@@ -29,6 +30,7 @@ pipeline {
     GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //Workaround for bug in Kubernetes Plugin JENKINS-52885
     NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}" //Set the k8s namespace to be either production or the branch name
     DEPLOY_IMAGE = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
+
   }
 
   stages {
@@ -78,8 +80,7 @@ pipeline {
     stage('Deploy Petclinic') {
       steps {
         container('gcloud') {
-          sh 'echo `pwd`'
-          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOY_IMAGE} ${NAMESPACE}"
+          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOYER_CLUSTER_ZONE} ${DEPLOY_IMAGE} ${NAMESPACE}"
         }
       }
     }

@@ -12,12 +12,27 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 SERVICE_ACCOUNT="cloudbees-svc-acct@${CLOUDBEES_PROJECT_ID}.iam.gserviceaccount.com"
 
 # Create service account unless it already exists. This service account will be used to push images to GCR and deploy the application
-if ! [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${SERVICE_ACCOUNT}($|[[:space:]]) ]]
+if [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${SERVICE_ACCOUNT}($|[[:space:]]) ]]
   then
-    # Create service account. This service account will be used to push images to GCR and deploy the application
-  echo "Creating cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
-  gcloud iam service-accounts create cloudbees-svc-acct --project=${CLOUDBEES_PROJECT_ID} --display-name "CloudBees Service Account" 
+  
+  # Enable Service Account to push containers to GCR on the GCP Deploy Project
+  echo "Remove role bindings for  Service Account"
+  gcloud projects remove-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
+  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/storage.admin
+
+  echo "Enabling Service Account to deploy Applications to cluster ${DEPLOYER_CLUSTER} on project ${DEPLOYER_PROJECT_ID}"
+  gcloud projects remove-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
+  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/container.admin
+  
+  # Create service account. This service account will be used to push images to GCR and deploy the application
+  echo "Deleting cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
+  gcloud iam service-accounts delete ${SERVICE_ACCOUNT} --quiet
+  
 fi 
+
+# Create service account. This service account will be used to push images to GCR and deploy the application
+echo "Creating cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
+gcloud iam service-accounts create cloudbees-svc-acct --project=${CLOUDBEES_PROJECT_ID} --display-name "CloudBees Service Account"
 
 # Enable Service Account to push containers to GCR on the GCP Deploy Project
 echo "Enabling Service Account to push containers to GCR on your behalf"

@@ -26,6 +26,9 @@ CLOUDBEES_NAMESPACE="cloudbees-core"
 # The GKE Cluster where you will deploy the Petclinic application
 DEPLOYER_CLUSTER="bin-auth-deploy"
 
+# The GCP zone for the GKE cluster where you will deploy the Petclinic application
+DEPLOYER_CLUSTER_ZONE="us-east1-b"
+
 
 ###################
 # Optional Changes

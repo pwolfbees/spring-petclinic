@@ -15,6 +15,7 @@ pipeline {
     ATTESTOR_PROJECT_ID = "REPLACE_ATTESTOR_PROJECT_ID"
     DEPLOYER_PROJECT_ID = "REPLACE_DEPLOYER_PROJECT_ID"  
     DEPLOYER_CLUSTER = "REPLACE_DEPLOYER_CLUSTER" 
+    DEPLOYER_CLUSTER_ZONE="REPLACE_DEPLOYER_ZONE"
     ATTESTOR = "REPLACE_ATTESTOR_ID"  //name of the attestor to use
     ATTESTOR_EMAIL = "REPLACE_ATTESTOR_EMAIL"
     ATTESTOR_KEY = "${ATTESTOR}.key" 
@@ -29,6 +30,7 @@ pipeline {
     GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //Workaround for bug in Kubernetes Plugin JENKINS-52885
     NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}" //Set the k8s namespace to be either production or the branch name
     DEPLOY_IMAGE = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
+
   }
 
   stages {
@@ -78,7 +80,7 @@ pipeline {
     stage('Deploy Petclinic') {
       steps {
         container('gcloud') {
-          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOY_IMAGE} ${NAMESPACE}"
+          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOYER_CLUSTER_ZONE} ${DEPLOY_IMAGE} ${NAMESPACE}"
         }
       }
     }

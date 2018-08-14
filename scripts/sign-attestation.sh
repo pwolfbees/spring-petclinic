@@ -25,8 +25,16 @@ if ! ( hash gpg 2>/dev/null ); then
   apt-get update apt-get install gnupg2 -y
 fi
 
+#check if gcloud is installed and install it if not
+if ! ( hash gcloud 2>/dev/null ); then
+  export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+  apt-get update && apt-get install google-cloud-sdk -y
+fi
+
 # authenticate service accout with required permissions to sign attestation
-./gcloud-credentials.sh $SVC_ACCT
+gcloud auth activate-service-account --key-file=$SVC_ACCT --no-user-output-enabled
 # generate full url of the image to sign
 artifact_url="$(gcloud container images describe $DEPLOY_IMAGE --format='value(image_summary.fully_qualified_digest)')"
 # import the private key from attestor 
