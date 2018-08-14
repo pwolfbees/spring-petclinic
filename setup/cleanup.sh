@@ -10,7 +10,7 @@ rm /tmp/$ATTESTOR_ID.key \
   /tmp/$ATTESTOR_ID-pub.pgp \
   /tmp/iam_request.json \
   /tmp/note_payload.json \
-  /tmp/cloudbees-svc-acct.json \
+  /tmp/cloudbees-secret.json \
   /tmp/verifier_iam_policy.json
 
 # remove gpg keys for attestor

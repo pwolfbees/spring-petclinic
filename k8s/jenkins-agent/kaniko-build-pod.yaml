@@ -17,7 +17,7 @@ spec:
     volumeMounts:
       - name: shared-root
         mountPath: /root
-      - name: cloudbees-svc-acct-secret
+      - name: cloudbees-secret
         mountPath: /secret
       - name: attestor-secret
         mountPath: /attestor
@@ -29,17 +29,17 @@ spec:
     tty: true
     env:
       - name: GOOGLE_APPLICATION_CREDENTIALS
-        value: /secret/cloudbees-svc-acct.json
+        value: /secret/cloudbees-secret.json
     volumeMounts:
-      - name: cloudbees-svc-acct-secret
+      - name: cloudbees-secret
         mountPath: /secret
   restartPolicy: Never
   volumes:
     - name: shared-root
       emptyDir: {}
-    - name: cloudbees-svc-acct-secret
+    - name: cloudbees-secret
       secret:
-        secretName: cloudbees-svc-acct-secret
+        secretName: cloudbees-secret
     - name: attestor-secret
       secret:
         secretName: attestor-secret

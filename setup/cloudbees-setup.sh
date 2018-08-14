@@ -34,7 +34,7 @@ gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
 # Download a local json key file for use with service account. This key will be used to create a secret on 
 # Kubernetes cluster and deleted when setup is done.
 echo "Creating local json file for ${SERVICE_ACCOUNT} to be used in K8s secret"
-gcloud iam service-accounts keys create /tmp/cloudbees-svc-acct.json \
+gcloud iam service-accounts keys create /tmp/cloudbees-secret.json \
   --iam-account ${SERVICE_ACCOUNT}
 
 # If the private key for Attestor is not already present from attestor-setup then export it again.
@@ -50,6 +50,6 @@ gcloud container clusters get-credentials ${CLOUDBEES_CLUSTER} \
 # Add Kubernetes secrets that contain the service account id and private signing key that can be used from Jenkins Pipeline. 
 # This will update an existing secret if it already exists
 echo "Creating Kubernetes secrets for Service Account and Attestor"
-kubectl create secret generic cloudbees-svc-acct-secret --from-file=/tmp/cloudbees-svc-acct.json -n ${CLOUDBEES_NAMESPACE} --dry-run -o yaml | kubectl apply -f -
+kubectl create secret generic cloudbees-svc-acct-secret --from-file=/tmp/cloudbees-secret.json -n ${CLOUDBEES_NAMESPACE} --dry-run -o yaml | kubectl apply -f -
 kubectl create secret generic attestor-secret --from-file=/tmp/${ATTESTOR_ID}.key -n ${CLOUDBEES_NAMESPACE} --dry-run -o yaml | kubectl apply -f -
 
