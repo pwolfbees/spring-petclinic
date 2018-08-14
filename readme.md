@@ -42,11 +42,7 @@ All of the setps needed to set up this demonstration are provided in the _setup_
 ### Setup scripts
 The setup.sh script runs multiple scripts to set up a particular part of the demonstration. Each of these scripts can also be run independently if you want to have more control of the installation or skip different steps.
 
-  * [container-analysis-setup](./setup/container-analysis-setup.sh) -  
-  * [attestor-setup](./setup/attestor-setup.sh)
+  * [container-analysis-setup](./setup/container-analysis-setup.sh) 
   * [cloudbees-setup](./setup/cloudbees-setup.sh)
   * [jenkinsfile-setup](./setup/jenkinsfile-setup.sh)
   * [cleanup](./setup/cleanup.sh)
-
-
-

@@ -4,15 +4,26 @@ metadata:
   name: kaniko-build-pod
 spec:
   containers:
+  - name: maven
+    image: maven:3.5.0
+    command:
+    - cat
+    tty: true
+  - name: gcloud
+    image: docker.io/beedemo/gcloud:gpg
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+      - name: cloudbees-secret
+        mountPath: /secret
+      - name: attestor-secret
+        mountPath: /attestor
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
     command:
     - /busybox/cat
-    tty: true
-    env:
-      - name: GOOGLE_APPLICATION_CREDENTIALS
-        value: /secret/cloudbees-secret.json
     volumeMounts:
       - name: cloudbees-secret
         mountPath: /secret
@@ -21,3 +32,6 @@ spec:
     - name: cloudbees-secret
       secret:
         secretName: cloudbees-secret
+    - name: attestor-secret
+      secret:
+        secretName: attestor-secret

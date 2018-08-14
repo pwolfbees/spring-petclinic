@@ -11,16 +11,13 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 # Name of the service account just created
 SERVICE_ACCOUNT="cloudbees-svc-acct@${CLOUDBEES_PROJECT_ID}.iam.gserviceaccount.com"
 
-# Delete service account if it already exists to reset demo. This service account will be used to push images to GCR and deploy the application
-if [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${SERVICE_ACCOUNT}($|[[:space:]]) ]]
+# Create service account unless it already exists. This service account will be used to push images to GCR and deploy the application
+if ! [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${SERVICE_ACCOUNT}($|[[:space:]]) ]]
   then
-    echo "Deleting existing cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
-    gcloud iam service-accounts delete ${SERVICE_ACCOUNT} --project=${CLOUDBEES_PROJECT_ID} --quiet
+    # Create service account. This service account will be used to push images to GCR and deploy the application
+  echo "Creating cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
+  gcloud iam service-accounts create cloudbees-svc-acct --project=${CLOUDBEES_PROJECT_ID} --display-name "CloudBees Service Account" 
 fi 
-
-# Create service account. This service account will be used to push images to GCR and deploy the application
-echo "Creating cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
-gcloud iam service-accounts create cloudbees-svc-acct --project=${CLOUDBEES_PROJECT_ID} --display-name "CloudBees Service Account" 
 
 # Enable Service Account to push containers to GCR on the GCP Deploy Project
 echo "Enabling Service Account to push containers to GCR on your behalf"
