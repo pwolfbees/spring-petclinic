@@ -27,6 +27,9 @@ spec:
     command:
     - /busybox/cat
     tty: true
+    env:
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        value: /secret/cloudbees-svc-acct.json
     volumeMounts:
       - name: cloudbees-svc-acct-secret
         mountPath: /secret
