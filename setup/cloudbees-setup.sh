@@ -26,7 +26,7 @@ gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
 
 echo "Enabling Service Account to deploy Applications to cluster ${DEPLOYER_CLUSTER} on project ${DEPLOYER_PROJECT_ID}"
 gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
-  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/container.developer
+  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/container.admin
 
 # Download a local json key file for use with service account. This key will be used to create a secret on 
 # Kubernetes cluster and deleted when setup is done.

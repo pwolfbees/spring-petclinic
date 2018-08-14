@@ -100,7 +100,7 @@ gpg --armor --export ${ATTESTOR_EMAIL} > /tmp/${ATTESTOR_ID}-pub.pgp
 # Create Attestor in Attestor Project. If this Attestor already exists recreate it.
 if [[ $(gcloud beta container binauthz attestors list --project=${ATTESTOR_PROJECT_ID} --format="value(name)") =~ (^|[[:space:]])${ATTESTOR_ID}($|[[:space:]]) ]]
   then
-    echo "Creating new Attestor"
+    echo "Deleting Existing Attestor"
     gcloud beta container binauthz attestors delete ${ATTESTOR_ID} \
     --project=${ATTESTOR_PROJECT_ID} 
 fi 

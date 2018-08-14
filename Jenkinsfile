@@ -16,8 +16,8 @@ pipeline {
     DEPLOYER_PROJECT_ID = "cloudbees-public"  
     DEPLOYER_CLUSTER = "bin-auth-deploy" 
     ATTESTOR = "demo-attestor"  //name of the attestor to use
-    ATTESTOR_EMAIL = "dattestor@example.com" 
-    ATTESTOR_KEY = "${ATTESTOR}.key"
+    ATTESTOR_EMAIL = "dattestor@example.com"
+    ATTESTOR_KEY = "${ATTESTOR}.key" 
     
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
