@@ -2,7 +2,8 @@
 
 set -e
 cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
-.configuration
+
+. configuration
 
 # remove all tmp files created during setup
 echo "Removing all temporary files created by setup"
@@ -15,6 +16,7 @@ rm /tmp/$ATTESTOR_ID.key \
 
 # remove gpg keys for attestor
 echo "Removing GPG key created by setup for demonstration"
-gpg --delete-secret-key "${ATTESTOR_NAME}" 
-gpg --delete-key "${ATTESTOR_NAME}"
+FINGERPRINT="$(gpg --with-colons --fingerprint $ATTESTOR_EMAIL | awk -F: '$1 == "fpr" {print $10;exit}')"
+gpg --delete-secret-keys --yes --batch "${FINGERPRINT}"
+gpg --delete-key --batch "${FINGERPRINT}"
 

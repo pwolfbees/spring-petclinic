@@ -9,4 +9,4 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 ./binary-authorization-setup.sh
 ./cloudbees-setup.sh
 ./jenkinsfile-setup.sh
-./cleansh.sh
+./cleanup.sh

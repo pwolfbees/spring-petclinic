@@ -8,6 +8,7 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 . configuration
 
+#gcloud auth application-default login
 echo "Setting gcloud project context to ${DEPLOYER_PROJECT_ID}"
 gcloud config set project ${DEPLOYER_PROJECT_ID}
 echo "Enabling required apis on project"
@@ -85,9 +86,9 @@ gpg --batch --gen-key <(
   cat << EOM
     Key-Type: RSA
     Key-Length: 2048
-    Name-Real: "${ATTESTOR_NAME}"
-    Name-Email: "${ATTESTOR_EMAIL}"
-    Passphrase: ""
+    Name-Real: ${ATTESTOR_NAME}
+    Name-Email: ${ATTESTOR_EMAIL}
+    %no-protection
     %commit
 EOM
 )
@@ -96,7 +97,14 @@ echo "Exporting private and public keys for Attestor"
 gpg --armor --export-secret-key "${ATTESTOR_NAME} <${ATTESTOR_EMAIL}>" > /tmp/${ATTESTOR_ID}.key
 gpg --armor --export ${ATTESTOR_EMAIL} > /tmp/${ATTESTOR_ID}-pub.pgp
 
-# Create Attestor in Attestor Project
+# Create Attestor in Attestor Project. If this Attestor already exists recreate it.
+if [[ $(gcloud beta container binauthz attestors list --project=${ATTESTOR_PROJECT_ID} --format="value(name)") =~ (^|[[:space:]])${ATTESTOR_ID}($|[[:space:]]) ]]
+  then
+    echo "Creating new Attestor"
+    gcloud beta container binauthz attestors delete ${ATTESTOR_ID} \
+    --project=${ATTESTOR_PROJECT_ID} 
+fi 
+
 echo "Creating new Attestor"
 gcloud beta container binauthz attestors create ${ATTESTOR_ID} \
   --project=${ATTESTOR_PROJECT_ID} \
