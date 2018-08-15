@@ -28,22 +28,22 @@ fi
 #check if gcloud is installed and install it if not
 if ! ( hash gcloud 2>/dev/null ); then
   export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  echo "deb http://packages.cloud.google.com/apt ${CLOUD_SDK_REPO} main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
   apt-get update && apt-get install google-cloud-sdk -y
 fi
 
 # authenticate service accout with required permissions to sign attestation
-gcloud auth activate-service-account --key-file=$SVC_ACCT --no-user-output-enabled
+gcloud auth activate-service-account --key-file=${SVC_ACCT} --no-user-output-enabled
 # generate full url of the image to sign
-artifact_url="$(gcloud container images describe $DEPLOY_IMAGE --format='value(image_summary.fully_qualified_digest)')"
+ARTIFACT_URL="$(gcloud container images describe ${DEPLOY_IMAGE} --format='value(image_summary.fully_qualified_digest)')"
 
-gcloud beta container binauthz create-signature-payload --artifact-url=$artifact_url > /tmp/generated_payload.json
+gcloud beta container binauthz create-signature-payload --artifact-url=${ARTIFACT_URL} > /tmp/generated_payload.json
 # import the private key from attestor
-gpg --allow-secret-key-import --import $ATTESTOR_PRIVATE_KEY
+gpg --allow-secret-key-import --import ${ATTESTOR_PRIVATE_KEY}
 # create signature from payload of image
-gpg --local-user $ATTESTOR_EMAIL --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
+gpg --local-user ${ATTESTOR_EMAI}L --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
 # create attestation using signature created
-gcloud beta container binauthz attestations create --artifact-url="$artifact_url" \
-  --attestor="projects/$ATTESTOR_PROJECT/attestors/$ATTESTOR_NAME}" --signature-file=/tmp/generated_signature.pgp \
-  --pgp-key-fingerprint="$(gpg --with-colons --fingerprint $ATTESTOR_EMAIL | awk -F: '$1 == "fpr" {print $10;exit}')"
+gcloud beta container binauthz attestations create --artifact-url="${ARTIFACT_URL}" \
+  --attestor="projects/${ATTESTOR_PROJECT}/attestors/${ATTESTOR_NAME}" --signature-file=/tmp/generated_signature.pgp \
+  --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
