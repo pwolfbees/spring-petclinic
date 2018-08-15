@@ -68,9 +68,9 @@ pipeline {
       }
     }
     stage('Attest Tagged Image') {
-      when {
-          buildingTag()
-      }
+    //when {
+    //  buildingTag()
+    //}
       steps {
         container('gcloud') {
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
