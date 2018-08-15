@@ -29,7 +29,7 @@ pipeline {
     //Env Variables set by context of running pipeline
     GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //Workaround for bug in Kubernetes Plugin JENKINS-52885
     NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}" //Set the k8s namespace to be either production or the branch name
-    DEPLOY_IMAGE = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
+    DEPLOY_IMAGE = "${IMAGE_URL}:${TAG_NAME ?: GIT_COMMIT}"
 
   }
 

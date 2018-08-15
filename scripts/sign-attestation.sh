@@ -40,6 +40,9 @@ artifact_url="$(gcloud container images describe $DEPLOY_IMAGE --format='value(i
 # import the private key from attestor 
 gpg --allow-secret-key-import --import $ATTESTOR_PRIVATE_KEY
 # create signature from payload of image
-gpg --local-user $ATTESTOR_EMAIL --armor --output /tmp/generated_signature.pgp --sign "$(gcloud beta container binauthz create-signature-payload --artifact-url=$artifact_url)"
+gpg --local-user $ATTESTOR_EMAIL --armor --output /tmp/generated_signature.pgp \
+  --sign < $(gcloud beta container binauthz create-signature-payload --artifact-url=$artifact_url)
 # create attestation using signature created
-gcloud beta container binauthz attestations create --artifact-url="$artifact_url" --attestor="projects/$ATTESTOR_PROJECT/attestors/$ATTESTOR_NAME}" --signature-file=/tmp/generated_signature.pgp --pgp-key-fingerprint="$(gpg --with-colons --fingerprint $ATTESTOR_EMAIL | awk -F: '$1 == "fpr" {print $10;exit}')"
+gcloud beta container binauthz attestations create --artifact-url="$artifact_url" \
+  --attestor="projects/$ATTESTOR_PROJECT/attestors/$ATTESTOR_NAME}" --signature-file=/tmp/generated_signature.pgp \
+  --pgp-key-fingerprint="$(gpg --with-colons --fingerprint $ATTESTOR_EMAIL | awk -F: '$1 == "fpr" {print $10;exit}')"
