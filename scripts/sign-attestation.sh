@@ -8,17 +8,17 @@ fi
 
 # args
 # 1 path to service account that has access to deploy
-$SVC_ACCT=$1
+SVC_ACCT=$1
 # 2 path to the private key of the attestor
-$ATTESTOR_PRIVATE_KEY=$2
+ATTESTOR_PRIVATE_KEY=$2
 # 3 name of the attestor to use
-$ATTESTOR_NAME=$3
+ATTESTOR_NAME=$3
 # 4 email address of the attestor
-$ATTESTOR_EMAIL=$4
+ATTESTOR_EMAIL=$4
 # 5 project that contains attestations
-$ATTESTOR_PROJECT=$5
+ATTESTOR_PROJECT=$5
 # 6 Full image url and tag of container to deploy
-$DEPLOY_IMAGE=$6
+DEPLOY_IMAGE=$6
 
 #check if gpg is installed locally and install if not
 if ! ( hash gpg 2>/dev/null ); then 

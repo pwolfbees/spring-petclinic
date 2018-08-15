@@ -18,7 +18,7 @@ pipeline {
     DEPLOYER_CLUSTER_ZONE="REPLACE_DEPLOYER_ZONE"
     ATTESTOR = "REPLACE_ATTESTOR_ID"  //name of the attestor to use
     ATTESTOR_EMAIL = "REPLACE_ATTESTOR_EMAIL"
-    ATTESTOR_KEY = "${ATTESTOR}.key" 
+    ATTESTOR_KEY = "/attestor/${ATTESTOR}.key" 
     
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
@@ -73,7 +73,7 @@ pipeline {
       }
       steps {
         container('gcloud') {
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_CONTAINER}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
     } 
@@ -83,11 +83,6 @@ pipeline {
           sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOYER_CLUSTER_ZONE} ${DEPLOY_IMAGE} ${NAMESPACE}"
         }
       }
-    }
-  }
-  post {
-    always {
-      deleteDir()
     }
   }
 }

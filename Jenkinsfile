@@ -14,11 +14,11 @@ pipeline {
     //Env Variables that must be set before first run
     ATTESTOR_PROJECT_ID = "cloudbees-public"
     DEPLOYER_PROJECT_ID = "cloudbees-public"  
-    DEPLOYER_CLUSTER = "cloudbees-public" 
+    DEPLOYER_CLUSTER = "cloudbees-core" 
     DEPLOYER_CLUSTER_ZONE="us-east1-b"
     ATTESTOR = "demo-attestor"  //name of the attestor to use
     ATTESTOR_EMAIL = "dattestor@example.com"
-    ATTESTOR_KEY = "${ATTESTOR}.key" 
+    ATTESTOR_KEY = "/attestor/${ATTESTOR}.key" 
     
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
@@ -73,7 +73,7 @@ pipeline {
       }
       steps {
         container('gcloud') {
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_CONTAINER}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
     } 
