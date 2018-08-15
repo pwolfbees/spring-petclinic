@@ -18,7 +18,8 @@ pipeline {
     DEPLOYER_CLUSTER_ZONE="us-east1-b"
     ATTESTOR = "demo-attestor"  //name of the attestor to use
     ATTESTOR_EMAIL = "dattestor@example.com"
-    ATTESTOR_KEY = "/attestor/${ATTESTOR}.key" 
+    ATTESTOR_KEY = "/attestor/${ATTESTOR}.key"
+    DEPLOYER_PRODUCTION_NAMESPACE = "production" 
     
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
@@ -27,9 +28,11 @@ pipeline {
     IMAGE_URL = "gcr.io/${DEPLOYER_PROJECT_ID}/${IMAGE_PREFIX}/${IMAGE_NAME}" //full container image URL without tag
     
     //Env Variables set by context of running pipeline
-    GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  //Workaround for bug in Kubernetes Plugin JENKINS-52885
-    NAMESPACE = "${TAG_NAME ? 'production' : BRANCH_NAME}" //Set the k8s namespace to be either production or the branch name
-    DEPLOY_IMAGE = "${IMAGE_URL}:${TAG_NAME ?: GIT_COMMIT}"
+    //Workaround for bug in Kubernetes Plugin JENKINS-52885
+    GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  
+    //Set the k8s namespace to be either production or the branch name
+    NAMESPACE = "${TAG_NAME ? DEPLOYER_PRODUCTION_NAMESPACE : BRANCH_NAME}" 
+    DEPLOY_IMAGE = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
 
   }
 
@@ -68,9 +71,9 @@ pipeline {
       }
     }
     stage('Attest Tagged Image') {
-    //when {
-    //  buildingTag()
-    //}
+      when {
+          buildingTag()
+      }
       steps {
         container('gcloud') {
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
