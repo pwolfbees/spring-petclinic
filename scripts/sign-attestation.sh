@@ -37,11 +37,12 @@ fi
 gcloud auth activate-service-account --key-file=$SVC_ACCT --no-user-output-enabled
 # generate full url of the image to sign
 artifact_url="$(gcloud container images describe $DEPLOY_IMAGE --format='value(image_summary.fully_qualified_digest)')"
-# import the private key from attestor 
+
+gcloud beta container binauthz create-signature-payload --artifact-url=$artifact_url > /tmp/generated_payload.json
+# import the private key from attestor
 gpg --allow-secret-key-import --import $ATTESTOR_PRIVATE_KEY
 # create signature from payload of image
-gpg --local-user $ATTESTOR_EMAIL --armor --output /tmp/generated_signature.pgp \
-  --sign < $(gcloud beta container binauthz create-signature-payload --artifact-url=$artifact_url)
+gpg --local-user $ATTESTOR_EMAIL --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
 # create attestation using signature created
 gcloud beta container binauthz attestations create --artifact-url="$artifact_url" \
   --attestor="projects/$ATTESTOR_PROJECT/attestors/$ATTESTOR_NAME}" --signature-file=/tmp/generated_signature.pgp \
