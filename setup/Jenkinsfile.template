@@ -32,7 +32,7 @@ pipeline {
     GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  
     //Set the k8s namespace to be either production or the branch name
     NAMESPACE = "${TAG_NAME ? DEPLOYER_PRODUCTION_NAMESPACE : BRANCH_NAME}" 
-    DEPLOY_IMAGE = "${IMAGE_URL}${TAG_NAME ?: GIT_COMMIT}"
+    DEPLOY_IMAGE = "${IMAGE_URL}:${TAG_NAME ?: GIT_COMMIT}"
 
   }
 
