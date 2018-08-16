@@ -4,6 +4,7 @@ metadata:
   name: petclinic-deploy
 spec:
   replicas: 1
+  progressDeadlineSeconds: 45
   template:
     metadata:
       labels:
