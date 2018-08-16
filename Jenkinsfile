@@ -69,8 +69,7 @@ pipeline {
       }
       steps {
         container('gcloud') {
-          sh "gcloud container images add-tag ${DEPLOY_IMAGE} ${IMAGE_URL}${TAG_NAME}"
-          sh "gcloud container images add-tag ${DEPLOY_IMAGE} 'latest'"
+          sh "./scripts/add_image_tags.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOY_IMAGE} ${IMAGE_URL} ${TAG_NAME}"
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
