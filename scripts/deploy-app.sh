@@ -31,7 +31,7 @@ NAMESPACE=$6
 
 #authenticate service accout with required permissions to deploy application
 gcloud auth activate-service-account --key-file=$CLOUDBEES_SVC_ACCT_KEY --no-user-output-enabled 
-# generate full url of the image to sign
+# generate full url with digest to deploy. This format is required by Binary Authorization
 ARTIFACT_URL="$(gcloud container images describe ${DEPLOY_IMAGE} --format='value(image_summary.fully_qualified_digest)')"
 # configure and apply the proper context for kubectl
 gcloud container clusters get-credentials ${TARGET_CLUSTER} --project ${TARGET_PROJECT} --zone ${TARGET_ZONE} --no-user-output-enabled

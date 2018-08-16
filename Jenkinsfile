@@ -32,12 +32,17 @@ pipeline {
     GIT_COMMIT = "${checkout (scm).GIT_COMMIT}"  
     //Set the k8s namespace to be either production or the branch name
     NAMESPACE = "${TAG_NAME ? DEPLOYER_PRODUCTION_NAMESPACE : BRANCH_NAME}" 
-    DEPLOY_IMAGE = "${IMAGE_URL}:${TAG_NAME ?: GIT_COMMIT}"
+    DEPLOY_IMAGE = "${IMAGE_URL}:${GIT_COMMIT}"
 
   }
 
   stages {
     stage('Maven') {
+      when {
+        not {
+          buildingTag()
+        }
+      }
       steps {
         container('maven') {
           sh 'mvn clean install'
@@ -58,24 +63,14 @@ pipeline {
         } 
       }
     }
-    stage('Create Production Image') {
-      when {
-          buildingTag()
-      }
-      steps {
-        container(name:'kaniko', shell:'/busybox/sh') {
-          sh '''#!/busybox/sh 
-          /kaniko/executor -f `pwd`/Dockerfile -c `pwd` -d ${IMAGE_URL}:${GIT_COMMIT} -d ${IMAGE_URL}:latest -d ${IMAGE_URL}:${TAG_NAME}
-          '''
-        }
-      }
-    }
     stage('Attest Tagged Image') {
       when {
           buildingTag()
       }
       steps {
         container('gcloud') {
+          sh "gcloud container images add-tag ${DEPLOY_IMAGE} ${IMAGE_URL}${TAG_NAME}"
+          sh "gcloud container images add-tag ${DEPLOY_IMAGE} 'latest'"
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
