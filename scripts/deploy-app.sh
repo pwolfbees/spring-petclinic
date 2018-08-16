@@ -31,10 +31,12 @@ NAMESPACE=$6
 
 #authenticate service accout with required permissions to deploy application
 gcloud auth activate-service-account --key-file=$CLOUDBEES_SVC_ACCT_KEY --no-user-output-enabled 
+# generate full url of the image to sign
+ARTIFACT_URL="$(gcloud container images describe ${DEPLOY_IMAGE} --format='value(image_summary.fully_qualified_digest)')"
 # configure and apply the proper context for kubectl
 gcloud container clusters get-credentials ${TARGET_CLUSTER} --project ${TARGET_PROJECT} --zone ${TARGET_ZONE} --no-user-output-enabled
 # update the deployment yaml with the image to be deployed
-sed -i.bak "s#REPLACEME#${DEPLOY_IMAGE}#" ./k8s/deploy/petclinic-app-deploy.yaml  
+sed -i.bak "s#REPLACEME#${ARTIFACT_URL}#" ./k8s/deploy/petclinic-app-deploy.yaml  
 # make sure the namepsace exists and create it if doesn't
 kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
 # deploy the load balancer for the application
