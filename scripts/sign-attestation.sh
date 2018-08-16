@@ -33,7 +33,6 @@ if ! ( hash gcloud 2>/dev/null ); then
   apt-get update && apt-get install google-cloud-sdk -y
 fi
 
-
 # authenticate service accout with required permissions to sign attestation
 gcloud auth activate-service-account --key-file=${SVC_ACCT} --no-user-output-enabled
 # generate full url of the image to sign

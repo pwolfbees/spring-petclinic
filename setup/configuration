@@ -39,12 +39,12 @@ DEPLOYER_CLUSTER_ZONE="us-east1-b"
 # These parameters can optionally be changed.
 
 # The name of the container analysis note to be created
-NOTE_ID="demo-note"
+NOTE_ID="build-attest-note"
 # The name of the demonstration attestor
-ATTESTOR_NAME="Demo Attestor"
+ATTESTOR_NAME="Build Attestor"
 # The email of the demonstration attestor
-ATTESTOR_EMAIL="dattestor@example.com"
+ATTESTOR_EMAIL="buildattestor@example.com"
 # The id of the demonstration attestor
-ATTESTOR_ID="demo-attestor"
+ATTESTOR_ID="build-attestor"
 # The Production Namespace to use for Tag Releases on Deployer Cluster. Default is "production"
 DEPLOYER_PRODUCTION_NAMESPACE="production"

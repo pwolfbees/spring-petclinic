@@ -3,9 +3,13 @@
 set -e
 cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
-# This script will create the appropriate secrets needed for the Jenkins Kubernetes plugin.
+# This script will create the appropriate secrets needed to create a service account.
+# The service account needs acccess to all projects, clusters, etc to push images, deploy pods, etc.
+# This setup also creates Kubernetes secrets that can be read by the Jenkins pipleine to 
+# log in as the service account and sign attestations.
 # https://github.com/jenkinsci/kubernetes-plugin
 
+# Load the configuration file so that all variables have context. 
 . configuration
 
 # Name of the service account just created

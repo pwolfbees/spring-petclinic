@@ -16,11 +16,15 @@ pipeline {
     DEPLOYER_PROJECT_ID = "partner-demo-dev"  
     DEPLOYER_CLUSTER = "bin-auth-deploy" 
     DEPLOYER_CLUSTER_ZONE="us-east1-b"
-    ATTESTOR = "demo-attestor"  //name of the attestor to use
-    ATTESTOR_EMAIL = "dattestor@example.com"
+    ATTESTOR = "build-attestor"  //name of the attestor to use
+    ATTESTOR_EMAIL = "buildattestor@example.com"
     ATTESTOR_KEY = "/attestor/${ATTESTOR}.key"
     DEPLOYER_PRODUCTION_NAMESPACE = "production" 
     
+    PROD_ATTEST_KEY="/prodattest/prodattest.key"
+    PROD_ATTESTOR="prod-attestor"
+    PROD_ATTEST_EMAIL="prodattestor@example.com"
+
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
     IMAGE_PREFIX = "bin-auth" //name of prefix for container images in GCR to separate from other images
@@ -65,21 +69,26 @@ pipeline {
     }
     stage('Attest Tagged Image') {
       when {
+        not {
+          buildingTag()
+        }
+      }
+      steps {
+        container('gcloud') {
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
+        }
+      }
+    } 
+    stage('Attest Tagged Image') {
+      when {
           buildingTag()
       }
       steps {
         container('gcloud') {
           sh "./scripts/add_image_tags.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOY_IMAGE} ${IMAGE_URL} ${TAG_NAME}"
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${ATTESTOR_KEY} ${ATTESTOR} ${ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${PROD_ATTEST_KEY} ${PROD_ATTESTOR} ${PROD_ATTEST_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
     } 
-    stage('Deploy Petclinic') {
-      steps {
-        container('gcloud') {
-          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_CLUSTER} ${DEPLOYER_PROJECT_ID} ${DEPLOYER_CLUSTER_ZONE} ${DEPLOY_IMAGE} ${NAMESPACE}"
-        }
-      }
-    }
   }
 }

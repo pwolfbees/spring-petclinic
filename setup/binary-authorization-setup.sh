@@ -6,6 +6,7 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 # Refer to latest Documentation for help
 # https://cloud.google.com/binary-authorization/docs/creating-attestors
 
+# Load the configuration file so that all variables have context
 . configuration
 
 #gcloud auth application-default login
@@ -97,7 +98,7 @@ echo "Exporting private and public keys for Attestor"
 gpg --armor --export-secret-key "${ATTESTOR_NAME} <${ATTESTOR_EMAIL}>" > /tmp/${ATTESTOR_ID}.key
 gpg --armor --export ${ATTESTOR_EMAIL} > /tmp/${ATTESTOR_ID}-pub.pgp
 
-# Create Attestor in Attestor Project. If this Attestor already exists recreate it.
+# Create Attestor in Attestor Project. If this Attestor already exists delete and recreate it.
 if [[ $(gcloud beta container binauthz attestors list --project=${ATTESTOR_PROJECT_ID} --format="value(name)") =~ (^|[[:space:]])${ATTESTOR_ID}($|[[:space:]]) ]]
   then
     echo "Deleting Existing Attestor"

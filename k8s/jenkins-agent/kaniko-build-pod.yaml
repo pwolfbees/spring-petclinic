@@ -19,6 +19,8 @@ spec:
         mountPath: /secret
       - name: attestor-secret
         mountPath: /attestor
+      - name: prod-attest
+        mountPath: /prodattest
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -36,3 +38,6 @@ spec:
     - name: attestor-secret
       secret:
         secretName: attestor-secret
+    - name: prod-attest
+      secret:
+        secretName: prod-attest
