@@ -42,4 +42,4 @@ kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-service-deploy.ya
 # deploy the application
 kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-app-deploy.yaml  
 # make sure that deployment succeeds
-kubectl rollout status deploy/petclinic-deploy
+kubectl rollout status deploy/petclinic-deploy -n ${NAMESPACE}
