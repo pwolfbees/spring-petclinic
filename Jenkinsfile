@@ -67,7 +67,7 @@ pipeline {
         } 
       }
     }
-    stage('Attest Build') {
+    stage('Attest Branch Image') {
       when {
         not {
           buildingTag()
@@ -79,13 +79,22 @@ pipeline {
         }
       }
     } 
-    stage('Attest Tag') {
+    stage('Add Tag to Image') {
       when {
           buildingTag()
       }
       steps {
         container('gcloud') {
           sh "./scripts/add_image_tags.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOY_IMAGE} ${IMAGE_URL} ${TAG_NAME}"
+        }
+      }
+    } 
+    stage('Attest Tag Image') {
+      when {
+          buildingTag()
+      }
+      steps {
+        container('gcloud') {
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${PROD_ATTEST_KEY} ${PROD_ATTESTOR} ${PROD_ATTEST_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
