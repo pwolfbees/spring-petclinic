@@ -41,5 +41,5 @@ kubectl get ns ${NAMESPACE} || kubectl create ns ${NAMESPACE}
 kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-service-deploy.yaml 
 # deploy the application
 kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-app-deploy.yaml  
-# make sure that deployment succeeds
+# make sure that deployment succeeds. This will not fail until timeout is reached
 kubectl rollout status deploy/petclinic-deploy -n ${NAMESPACE}
