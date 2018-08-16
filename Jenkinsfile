@@ -67,7 +67,7 @@ pipeline {
         } 
       }
     }
-    stage('Attest Tagged Image') {
+    stage('Attest Build') {
       when {
         not {
           buildingTag()
@@ -79,7 +79,7 @@ pipeline {
         }
       }
     } 
-    stage('Attest Tagged Image') {
+    stage('Attest Tag') {
       when {
           buildingTag()
       }
