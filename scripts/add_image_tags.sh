@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-
 if [ $# -ne 4 ];
     then echo "Usage: gcloud-credentials.sh <path to service acct key> <Deployed Image> <IMAGE URL> <Tag Name>"
     exit 1
@@ -28,4 +27,4 @@ fi
 #authenticate service accout with required permissions to sign attestation
 gcloud auth activate-service-account --key-file=${SVC_ACCT} --no-user-output-enabled
 # Add new tag to existing image
-gcloud container images add-tag ${DEPLOY_IMAGE} ${IMAGE_URL}:${TAG}
+gcloud container images add-tag ${DEPLOY_IMAGE} ${IMAGE_URL}:${TAG} --quiet
