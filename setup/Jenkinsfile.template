@@ -94,13 +94,22 @@ pipeline {
         }
       }
     }
-    stage('Attest Tagged Image') {
+    stage('Add Tag to Image') {
       when {
           buildingTag()
       }
       steps {
         container('gcloud') {
           sh "./scripts/add_image_tags.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOY_IMAGE} ${IMAGE_URL} ${TAG_NAME}"
+        }
+      }
+    }  
+    stage('Attest Tagged Image') {
+      when {
+          buildingTag()
+      }
+      steps {
+        container('gcloud') {
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TAG_ATTESTOR_KEY} ${TAG_ATTESTOR_ID} ${TAG_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
