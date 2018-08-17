@@ -47,4 +47,4 @@ kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-app-deploy.yaml
 kubectl rollout status deploy/petclinic-deploy -n ${NAMESPACE}
 
 echo "Application is available at IP: "
-kubectl describe services petclinic-lb -n master | grep "LoadBalancer Ingress:"
+kubectl describe services petclinic-lb -n ${NAMESPACE} | grep "LoadBalancer Ingress:"
