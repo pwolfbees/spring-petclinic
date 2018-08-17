@@ -45,3 +45,6 @@ kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-service-deploy.ya
 kubectl --namespace=${NAMESPACE} apply -f k8s/deploy/petclinic-app-deploy.yaml  
 # make sure that deployment succeeds. This will not fail until timeout is reached
 kubectl rollout status deploy/petclinic-deploy -n ${NAMESPACE}
+
+echo "Application is available at IP: "
+kubectl describe services petclinic-lb -n master | grep "LoadBalancer Ingress:"
