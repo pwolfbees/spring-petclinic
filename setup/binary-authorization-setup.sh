@@ -18,6 +18,7 @@ DEPLOYER_PROJECT_NUMBER=$(gcloud projects describe "${DEPLOYER_PROJECT_ID}" --fo
 ATTESTOR_PROJECT_NUMBER=$(gcloud projects describe "${ATTESTOR_PROJECT_ID}" --format="value(projectNumber)")
 DEPLOYER_SERVICE_ACCOUNT="service-${DEPLOYER_PROJECT_NUMBER}@gcp-sa-binaryauthorization.iam.gserviceaccount.com"
 ATTESTOR_SERVICE_ACCOUNT="service-${ATTESTOR_PROJECT_NUMBER}@gcp-sa-binaryauthorization.iam.gserviceaccount.com"
+CLOUDBEES_SERVICE_ACCOUNT="cloudbees-svc-acct@${CLOUDBEES_PROJECT_ID}.iam.gserviceaccount.com"
 
 echo "Generating json for Build Attestor container analysis note"
 cat > /tmp/build_note_payload.json << EOM
@@ -79,7 +80,8 @@ cat > /tmp/build_iam_request.json << EOM
         "role": "roles/containeranalysis.notes.occurrences.viewer",
         "members": [
           "serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}",
-          "serviceAccount:${ATTESTOR_SERVICE_ACCOUNT}"
+          "serviceAccount:${ATTESTOR_SERVICE_ACCOUNT}",
+           "serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT}"
         ]
       }
     ]
@@ -97,7 +99,8 @@ cat > /tmp/tag_iam_request.json << EOM
         "role": "roles/containeranalysis.notes.occurrences.viewer",
         "members": [
           "serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}",
-          "serviceAccount:${ATTESTOR_SERVICE_ACCOUNT}"
+          "serviceAccount:${ATTESTOR_SERVICE_ACCOUNT}",
+          "serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT}"
         ]
       }
     ]
@@ -165,7 +168,7 @@ if [[ $(gcloud beta container binauthz attestors list --project=${ATTESTOR_PROJE
 fi 
 
 # If this Tag Attestor already exists delete and recreate it.
-if [[ $(gcloud beta container binauthz attestors list --project=${ATTESTOR_PROJECT_ID} --format="value(name)") =~ (^|[[:space:]])${BUILD_ATTESTOR_ID}($|[[:space:]]) ]]
+if [[ $(gcloud beta container binauthz attestors list --project=${ATTESTOR_PROJECT_ID} --format="value(name)") =~ (^|[[:space:]])${TAG_ATTESTOR_ID}($|[[:space:]]) ]]
   then
     echo "Deleting Existing Tag Attestor"
     gcloud beta container binauthz attestors delete ${TAG_ATTESTOR_ID} \

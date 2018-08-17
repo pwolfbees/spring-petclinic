@@ -13,10 +13,10 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 . configuration
 
 # Name of the service account just created
-SERVICE_ACCOUNT="cloudbees-svc-acct@${CLOUDBEES_PROJECT_ID}.iam.gserviceaccount.com"
+CLOUDBEES_SERVICE_ACCOUNT="cloudbees-svc-acct@${CLOUDBEES_PROJECT_ID}.iam.gserviceaccount.com"
 
 # Create service account unless it already exists. This service account will be used to push images to GCR and deploy the application
-if ! [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${SERVICE_ACCOUNT}($|[[:space:]]) ]]
+if ! [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${CLOUDBEES_SERVICE_ACCOUNT}($|[[:space:]]) ]]
   then
 
   # Create service account. This service account will be used to push images to GCR and deploy the application
@@ -28,29 +28,29 @@ fi
 # Enable Service Account to push containers to GCR on the GCP Deploy Project
 echo "Enabling Service Account to push containers to GCR on your behalf"
 gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
-  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/storage.admin
+  --member serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT} --role roles/storage.admin
 
 echo "Enabling Service Account to deploy Applications to cluster ${DEPLOYER_CLUSTER} on project ${DEPLOYER_PROJECT_ID}"
 gcloud projects add-iam-policy-binding ${DEPLOYER_PROJECT_ID} \
-  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/container.admin
+  --member serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT} --role roles/container.admin
 
 echo "Enabling Service Account to attach container analysis notes on project ${ATTESTOR_PROJECT_ID}"
 gcloud projects add-iam-policy-binding ${ATTESTOR_PROJECT_ID} \
-  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/containeranalysis.notes.attacher
+  --member serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT} --role roles/containeranalysis.notes.attacher
 
 echo "Enabling Service Account update container analysis occurences on project ${ATTESTOR_PROJECT_ID}"
 gcloud projects add-iam-policy-binding ${ATTESTOR_PROJECT_ID} \
-  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/containeranalysis.occurrences.editor
+  --member serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT} --role roles/containeranalysis.occurrences.editor
 
 echo "Enabling Service Account to veiw Binary Authorization Attestors on project ${ATTESTOR_PROJECT_ID}"
 gcloud projects add-iam-policy-binding ${ATTESTOR_PROJECT_ID} \
-  --member serviceAccount:${SERVICE_ACCOUNT} --role roles/binaryauthorization.attestorsViewer
+  --member serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT} --role roles/binaryauthorization.attestorsViewer
 
 # Download a local json key file for use with service account. This key will be used to create a secret on 
 # Kubernetes cluster and deleted when setup is done.
-echo "Creating local json file for ${SERVICE_ACCOUNT} to be used in K8s secret"
+echo "Creating local json file for ${CLOUDBEES_SERVICE_ACCOUNT} to be used in K8s secret"
 gcloud iam service-accounts keys create /tmp/cloudbees-secret.json \
-  --iam-account ${SERVICE_ACCOUNT}
+  --iam-account ${CLOUDBEES_SERVICE_ACCOUNT}
 
 # Set context for kubectl to the cluster and project where the Jenkins Pipeline will run
 echo "Setting context for kubectl to ${CLOUDBEES_CLUSTER} to create Kubernetes secrets"
