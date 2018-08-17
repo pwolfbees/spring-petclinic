@@ -17,10 +17,10 @@ spec:
     volumeMounts:
       - name: cloudbees-secret
         mountPath: /secret
-      - name: attestor-secret
-        mountPath: /attestor
-      - name: prod-attest
-        mountPath: /prodattest
+      - name: build-attestor-secret
+        mountPath: /buildsecret
+      - name: tag-attestor-secret
+        mountPath: /tagsecret
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -35,9 +35,9 @@ spec:
     - name: cloudbees-secret
       secret:
         secretName: cloudbees-secret
-    - name: attestor-secret
+    - name: build-attestor-secret
       secret:
-        secretName: attestor-secret
-    - name: prod-attest
+        secretName: build-attestor-secret
+    - name: tag-attestor-secret
       secret:
-        secretName: prod-attest
+        secretName: tag-attestor-secret

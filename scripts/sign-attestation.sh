@@ -12,7 +12,7 @@ SVC_ACCT=$1
 # 2 path to the private key of the attestor
 ATTESTOR_PRIVATE_KEY=$2
 # 3 name of the attestor to use
-ATTESTOR_NAME=$3
+ATTESTOR_ID=$3
 # 4 email address of the attestor
 ATTESTOR_EMAIL=$4
 # 5 project that contains attestations
@@ -45,5 +45,9 @@ gpg --allow-secret-key-import --import ${ATTESTOR_PRIVATE_KEY}
 gpg --local-user ${ATTESTOR_EMAI}L --armor --output /tmp/generated_signature.pgp --sign /tmp/generated_payload.json
 # create attestation using signature created
 gcloud beta container binauthz attestations create --artifact-url="${ARTIFACT_URL}" \
-  --attestor="projects/${ATTESTOR_PROJECT}/attestors/${ATTESTOR_NAME}" --signature-file=/tmp/generated_signature.pgp \
+  --attestor="projects/${ATTESTOR_PROJECT}/attestors/${ATTESTOR_ID}" --signature-file=/tmp/generated_signature.pgp \
   --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
+
+echo "Attestation created by Attestor: ${ATTESTOR_ID} for Image: ${ARTIFACT_URL}"
+
+gcloud beta container binauthz attestations list --attestor=${ATTESTOR_ID} --project=${ATTESTOR_PROJECT} --artifact-url=${ARTIFACT_URL}"
