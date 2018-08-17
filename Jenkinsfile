@@ -73,7 +73,7 @@ pipeline {
       }
       steps {
         container('gcloud') {
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${BUILD_ATTESTOR_KEY} ${BUILD_ATTESTOR} ${BUILD_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${BUILD_ATTESTOR_KEY} ${BUILD_ATTESTOR_ID} ${BUILD_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
     }  
@@ -84,7 +84,7 @@ pipeline {
       steps {
         container('gcloud') {
           sh "./scripts/add_image_tags.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOY_IMAGE} ${IMAGE_URL} ${TAG_NAME}"
-          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TAG_ATTESTOR_KEY} ${TAG_ATTESTOR} ${TAG_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
+          sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TAG_ATTESTOR_KEY} ${TAG_ATTESTOR_ID} ${TAG_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
     }  
