@@ -49,7 +49,3 @@ gcloud beta container binauthz attestations create --artifact-url="${ARTIFACT_UR
   --pgp-key-fingerprint="$(gpg --with-colons --fingerprint ${ATTESTOR_EMAIL} | awk -F: '$1 == "fpr" {print $10;exit}')"
 
 echo "Attestation created by Attestor: ${ATTESTOR_ID} for Image: ${ARTIFACT_URL}"
-# Sleep for 15 seconds to give note time to be created
-sleep 10
-# Get public key of the attestation that was created on note
-#gcloud beta container binauthz attestations list --attestor=${ATTESTOR_ID} --project=${ATTESTOR_PROJECT} --artifact-url=${ARTIFACT_URL}

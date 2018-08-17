@@ -82,6 +82,18 @@ pipeline {
         }
       }
     }  
+    stage('Deploy Dev Branch') {
+      when {
+        not {
+          buildingTag()
+        }
+      }
+      steps {
+        container('gcloud') {
+          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_DEV_CLUSTER_NAME} ${DEPLOYER_PROJECT_ID} ${DEPLOYER_DEV_CLUSTER_ZONE} ${DEPLOY_IMAGE} ${NAMESPACE}"
+        }
+      }
+    }
     stage('Add Tag to Image') {
       when {
           buildingTag()
@@ -101,6 +113,16 @@ pipeline {
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${TAG_ATTESTOR_KEY} ${TAG_ATTESTOR_ID} ${TAG_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
-    }  
+    } 
+    stage('Deploy Dev Branch') {
+      when {
+          buildingTag()
+      }
+      steps {
+        container('gcloud') {
+          sh "./scripts/deploy-app.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${DEPLOYER_PROD_CLUSTER_NAME} ${DEPLOYER_PROJECT_ID} ${DEPLOYER_PROD_CLUSTER_ZONE} ${DEPLOY_IMAGE} ${NAMESPACE}"
+        }
+      }
+    } 
   }
 }

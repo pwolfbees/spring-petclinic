@@ -18,19 +18,7 @@ DEPLOYER_PROJECT_NUMBER=$(gcloud projects describe "${DEPLOYER_PROJECT_ID}" --fo
 ATTESTOR_PROJECT_NUMBER=$(gcloud projects describe "${ATTESTOR_PROJECT_ID}" --format="value(projectNumber)")
 DEPLOYER_SERVICE_ACCOUNT="service-${DEPLOYER_PROJECT_NUMBER}@gcp-sa-binaryauthorization.iam.gserviceaccount.com"
 ATTESTOR_SERVICE_ACCOUNT="service-${ATTESTOR_PROJECT_NUMBER}@gcp-sa-binaryauthorization.iam.gserviceaccount.com"
-CLOUDBEES_SERVICE_ACCOUNT="cloudbees-svc-acct@${CLOUDBEES_PROJECT_ID}.iam.gserviceaccount.com"
 
-# Create service account for Cloudbees unless it already exists. 
-# This service account will be used to push images to GCR and deploy the application
-if ! [[ $(gcloud iam service-accounts list --project ${CLOUDBEES_PROJECT_ID} --format="value(email)") =~ (^|[[:space:]])${CLOUDBEES_SERVICE_ACCOUNT}($|[[:space:]]) ]]
-  then
-
-  # Create service account. This service account will be used to push images to GCR and deploy the application
-  echo "Creating cloudbees-svc-account in GCP Project: ${CLOUDBEES_PROJECT_ID}"
-  gcloud iam service-accounts create cloudbees-svc-acct --project=${CLOUDBEES_PROJECT_ID} \
-    --display-name "CloudBees Service Account"
-
-fi 
 
 echo "Generating json for Build Attestor container analysis note"
 cat > /tmp/build_note_payload.json << EOM
@@ -93,7 +81,6 @@ cat > /tmp/build_iam_request.json << EOM
         "members": [
           "serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}",
           "serviceAccount:${ATTESTOR_SERVICE_ACCOUNT}",
-           "serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT}"
         ]
       }
     ]
@@ -112,7 +99,6 @@ cat > /tmp/tag_iam_request.json << EOM
         "members": [
           "serviceAccount:${DEPLOYER_SERVICE_ACCOUNT}",
           "serviceAccount:${ATTESTOR_SERVICE_ACCOUNT}",
-          "serviceAccount:${CLOUDBEES_SERVICE_ACCOUNT}"
         ]
       }
     ]
