@@ -45,6 +45,11 @@ pipeline {
 
   stages {
     stage('Maven') {
+      when {
+        not {
+          buildingTag()
+        }
+      }
       steps {
         container('maven') {
           sh 'mvn clean install'
