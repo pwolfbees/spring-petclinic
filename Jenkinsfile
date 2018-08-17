@@ -81,7 +81,7 @@ pipeline {
           sh "./scripts/sign-attestation.sh ${GOOGLE_APPLICATION_CREDENTIALS} ${BUILD_ATTESTOR_KEY} ${BUILD_ATTESTOR_ID} ${BUILD_ATTESTOR_EMAIL} ${ATTESTOR_PROJECT_ID} ${DEPLOY_IMAGE}"
         }
       }
-    } 
+    }  
     stage('Add Tag to Image') {
       when {
           buildingTag()
