@@ -114,7 +114,7 @@ pipeline {
         }
       }
     } 
-    stage('Deploy Dev Branch') {
+    stage('Deploy Release') {
       when {
           buildingTag()
       }
