@@ -51,5 +51,5 @@ gcloud beta container binauthz attestations create --artifact-url="${ARTIFACT_UR
 echo "Attestation created by Attestor: ${ATTESTOR_ID} for Image: ${ARTIFACT_URL}"
 
 echo "gcloud beta container binauthz attestations list --attestor=${ATTESTOR_ID} --project=${ATTESTOR_PROJECT} --artifact-url=${ARTIFACT_URL}"
-
+sleep 30
 gcloud beta container binauthz attestations list --attestor=${ATTESTOR_ID} --project=${ATTESTOR_PROJECT} --artifact-url=${ARTIFACT_URL}
