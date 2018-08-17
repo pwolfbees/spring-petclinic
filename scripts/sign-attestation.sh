@@ -52,4 +52,4 @@ echo "Attestation created by Attestor: ${ATTESTOR_ID} for Image: ${ARTIFACT_URL}
 # Sleep for 15 seconds to give note time to be created
 sleep 10
 # Get public key of the attestation that was created on note
-gcloud beta container binauthz attestations list --attestor=${ATTESTOR_ID} --project=${ATTESTOR_PROJECT} --artifact-url=${ARTIFACT_URL}
+#gcloud beta container binauthz attestations list --attestor=${ATTESTOR_ID} --project=${ATTESTOR_PROJECT} --artifact-url=${ARTIFACT_URL}
