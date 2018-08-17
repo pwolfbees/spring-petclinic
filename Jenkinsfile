@@ -27,7 +27,7 @@ pipeline {
     
     TAG_ATTESTOR_ID="tag-attestor"  //name of the attestor to use
     TAG_ATTESTOR_EMAIL="tagattestor@example.com"
-    TAG_ATTESTOR_KEY="/buildsecret/${TAG_ATTESTOR_ID}.key"
+    TAG_ATTESTOR_KEY="/tagsecret/${TAG_ATTESTOR_ID}.key"
     
     //Static Env Variables
     GOOGLE_APPLICATION_CREDENTIALS = "/secret/cloudbees-secret.json" //name of the secret file containing service account credentials
